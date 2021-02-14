@@ -1,0 +1,42 @@
+@import '../colors';
+body {
+    &.light{
+        color: $text-light;
+        background-color: $background-light;
+        ::selection {
+            color: $background-light;
+            background: $accent-light; /* WebKit/Blink Browsers */
+        }
+        ::-moz-selection {
+            color: $background-light;
+            background: $accent-light; /* Gecko Browsers */
+        }
+        a, a:visited {
+            color: $text-light;
+        }
+        a:hover {
+            color: $accent-light;
+        }
+        
+    }
+    &.dark{
+        color: $text-dark;
+        background-color: $background-dark;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        ::selection {
+            color: $background-dark;
+            background: $accent-dark; /* WebKit/Blink Browsers */
+          }
+        ::-moz-selection {
+        color: $background-dark;
+        background: $accent-dark; /* Gecko Browsers */
+        }
+        a, a:visited {
+            color: $text-dark;
+        }
+        a:hover {
+            color: $accent-dark;
+        }
+    }
+}

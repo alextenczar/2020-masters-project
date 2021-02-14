@@ -1,0 +1,53 @@
+import { useParams} from "react-router-dom";
+import axios from 'axios';
+import * as config from '../config/config.js';
+import React, { useState, useEffect } from 'react';
+
+function Search(props) {
+    const { name } = useParams();
+    const [artistInfo, setArtistInfo] = useState({});
+    const [spotArtistInfo, setSpotArtistInfo] = useState({});
+    const name_fixed = name.replace(/\+/g, ' ');
+    const last_url = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=';
+    const spot_url = 'https://api.spotify.com/v1/search?q=';
+    const last_key = config.keys.last_api_key;
+    const spot_results = props.location.state;
+    const spot_token = JSON.parse(localStorage.getItem('params'));
+    
+    useEffect(() => {
+        axios.get(`${last_url}${name}&api_key=${last_key}&format=json`)
+        .then(({ data }) => {
+            setArtistInfo(data.artist);
+        })
+        axios.get(`${spot_url}${name}&type=artist&limit=1`, {
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                Authorization: spot_token.token_type + " " + spot_token.access_token,
+            }
+        })
+        .then(({ data }) => {
+            if(typeof data.artists !== "undefined" && name !== "") {
+                setSpotArtistInfo(data.artists.items[0]);
+                
+            }
+        })
+    }, []);
+
+    if (Object.keys(artistInfo).length !== 0 && Object.keys(spotArtistInfo).length !==0) {
+        console.log(artistInfo);
+        return (
+            <>
+                <>{name_fixed}</>
+                <img src={spotArtistInfo.images[1].url}></img>
+            </>
+        )
+    }
+    return (
+        <>
+            <>{name_fixed}</>
+        </>
+    )
+};
+export default Search;
+
