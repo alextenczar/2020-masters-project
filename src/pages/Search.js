@@ -2,6 +2,7 @@ import { useParams} from "react-router-dom";
 import axios from 'axios';
 import * as config from '../config/config.js';
 import React, { useState, useEffect } from 'react';
+import SimilarArtists from '../components/SimilarArtists.js';
 
 function Search(props) {
     const { name } = useParams();
@@ -15,6 +16,9 @@ function Search(props) {
     const spot_token = JSON.parse(localStorage.getItem('params'));
     
     useEffect(() => {
+        if(spot_token === null) {
+            setTimeout(() => { }, 100);
+        }
         axios.get(`${last_url}${name}&api_key=${last_key}&format=json`)
         .then(({ data }) => {
             setArtistInfo(data.artist);
@@ -38,8 +42,9 @@ function Search(props) {
         console.log(artistInfo);
         return (
             <>
-                <>{name_fixed}</>
+                <h1>{name_fixed}</h1><br></br>
                 <img src={spotArtistInfo.images[1].url}></img>
+                <SimilarArtists artist={name}></SimilarArtists>
             </>
         )
     }
