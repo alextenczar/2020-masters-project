@@ -39,11 +39,10 @@ function Search(props) {
     }, []);
 
     if (Object.keys(artistInfo).length !== 0 && Object.keys(spotArtistInfo).length !==0) {
-        console.log(artistInfo);
         return (
             <>
-                <h1>{name_fixed}</h1><br></br>
-                <img src={spotArtistInfo.images[1].url}></img>
+                {/*<h1>{name_fixed}</h1><br></br>*/}
+                {/* <img src={spotArtistInfo.images[1].url}></img> */}
                 <SimilarArtists artist={name}></SimilarArtists>
             </>
         )

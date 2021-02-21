@@ -5,7 +5,7 @@ import '../styles/components/searchbar.scss';
 import { Link } from 'react-router-dom';
 
 
-const last_url = 'http://ws.audioscrobbler.com/2.0/?method=artist.search&artist=';
+const last_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.search&artist=';
 const spot_url = 'https://api.spotify.com/v1/search?q=';
 const last_key = config.keys.last_api_key;
 const spot_token = JSON.parse(localStorage.getItem('params'));

@@ -3,8 +3,9 @@ import * as config from '../config/config.js';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
-const last_url = 'http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=';
-const spot_url = 'https://api.spotify.com/v1/search?q=';
+const last_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=';
+const spot_search_url = 'https://api.spotify.com/v1/search?q=';
+const spot_similar_url = 'https://api.spotify.com/v1/artists/'
 const last_key = config.keys.last_api_key;
 const spot_token = JSON.parse(localStorage.getItem('params'));
 
@@ -13,90 +14,167 @@ class SimilarArtists extends Component {
         super();
         this.state = {
             artist: undefined,
+            artistObject: {},
             lastArtists: [],
             spotArtists: [],
         }
     }
-    
-    getSimilar = () => {
-        axios.get(`${last_url}${this.state.artist}&api_key=${last_key}&format=json`)
-        .then(({ data }) => {
-            if(typeof data.similarartists !== "undefined" && this.state.artist !== undefined) {
-                this.setState({
-                    lastArtists: data.similarartists.artist.slice()
-                }, () => {
-                        const tempSpotArtistArray = []
-                        const tempLastArtistArray = []
-                        var j = 0;
-                        for(var i = 0; i < this.state.lastArtists.length; i++) {
-                            const similarQuery = this.state.lastArtists[i];
-                            //console.log(similarQuery.name);
-                            axios.get(`${spot_url}${similarQuery.name}&type=artist&limit=1`, {
-                                headers: {
-                                    "Accept": "application/json",
-                                    "Content-Type": "application/json",
-                                    Authorization: spot_token.token_type + " " + spot_token.access_token,
-                                }
-                            }).then(({ data }) => {
-                                const spotifySearchResult = data.artists.items[0]
-                                if(typeof spotifySearchResult !== "undefined" && typeof data.artists !== "undefined" && this.state.artist !== undefined && similarQuery.name.toUpperCase() === spotifySearchResult.name.toUpperCase()) {
-                                    tempLastArtistArray.push(similarQuery);
-                                    tempSpotArtistArray.push(spotifySearchResult);
-                                }
-                                else
-                                {
-                                    tempSpotArtistArray.push('null');
-                                    tempLastArtistArray.push('null');
-                                }
-                                j++;
-                            })
-                        }
-                        setTimeout(() => {
-                            this.setState({spotArtists: tempSpotArtistArray}, () => {console.log(this.state.spotArtists);})
-                            this.setState({lastArtists: tempLastArtistArray}, () => {console.log(this.state.lastArtists); })   
-                        }, 1000);
-                        this.forceUpdate();
-               
-                    }
-                );
-            }
-            if(this.state.artist == "")
-            {
-/*                 this.setState({
-                    last_results: []
-                }) */
+
+    async getLast(){
+        const lastPromise = await axios.get(`${last_url}${this.state.artist}&api_key=${last_key}&format=json`)
+        console.log(lastPromise);
+        return lastPromise;
+    }
+
+    getSpotSearch = () => {
+        const artistName = this.state.artist;
+        if(spot_token === null) {
+            setTimeout(() => { }, 100);
+        }
+        axios.get(`${spot_search_url}${artistName}&type=artist&limit=1`, {
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                Authorization: spot_token.token_type + " " + spot_token.access_token,
             }
         })
-        this.forceUpdate();     
+        .then(({ data }) => {
+            if(typeof data.artists !== "undefined" && artistName !== "") {
+                this.setState({artistObject: data.artists.items[0]});
+                console.log(data);
+            }
+        })
     }
+
+    getSpotSimilar = () => {
+        const tempLastArtistArray = []
+        const tempSpotArtistArray = []
+        const promises = []
+        this.getLast().then(({data}) => {
+            this.setState({lastArtists: data.similarartists.artist.slice()}, () => {
+                var j = 0;
+                if(this.state.lastArtists.length === 0 && typeof this.state.artistObject !== 'undefined') {
+                    const artist_id = this.state.artistObject.id;
+                    promises.push(axios.get(`${spot_similar_url}${artist_id}/related-artists`, {
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            Authorization: spot_token.token_type + " " + spot_token.access_token,
+                        }
+                    }).then(({data}) => {
+                        Promise.all(promises).then(() => { 
+                            this.setState({spotArtists: data.artists})
+                            console.log(data.artists);
+                        });
+                    }))
+                }
+                else if(this.state.lastArtists.length > 0) {
+                    for(var i = 0; i < this.state.lastArtists.length; i++) {
+                        const similarQuery = this.state.lastArtists[i];
+                        promises.push(axios.get(`${spot_search_url}${similarQuery.name}&type=artist&limit=1`, {
+                            headers: {
+                                "Accept": "application/json",
+                                "Content-Type": "application/json",
+                                Authorization: spot_token.token_type + " " + spot_token.access_token,
+                            }
+                        })
+                        .then(({ data }) => {
+                            const spotifySearchResult = data.artists.items[0]
+                            if(typeof spotifySearchResult !== "undefined" && typeof data.artists !== "undefined" && this.state.artist !== undefined && similarQuery.name.toUpperCase() === spotifySearchResult.name.toUpperCase()) {
+                                tempLastArtistArray.push(similarQuery);
+                                tempSpotArtistArray.push(spotifySearchResult);
+                            }
+                            else
+                            {
+                                tempSpotArtistArray.push('null');
+                                tempLastArtistArray.push('null');
+                            }
+                            j++;
+                        }).catch(err => {
+                            return null;
+                        }))
+                    }
+                    Promise.all(promises).then(() => { 
+                        console.log(tempSpotArtistArray);
+                        console.log(tempLastArtistArray);
+                        this.setState({spotArtists: tempSpotArtistArray})
+                        this.setState({lastArtists: tempLastArtistArray})
+                    });
+                }
+            })
+        })
+    }
+
     componentDidMount(){
         this.setState({artist: this.props.artist}, () =>
         {
-            this.getSimilar();
+            this.getSpotSearch();
+            this.getSpotSimilar();
         });
+    }
+
+    componentDidUpdate (newProps) {
+        if(this.props.artist != this.state.artist){
+            this.setState({artist: this.props.artist}, () =>
+            {
+                this.setState({spotArtists: []})
+                this.setState({lastArtists: []})
+                this.getSpotSearch();
+                this.getSpotSimilar();
+            })
+        }
     }
     
     render() {
-        const images = []
-        const imageTest = this.state.spotArtists;
-        console.log(this.state.spotArtists.length);
-        for (var k = 0; k < 100; k++)
-        {
-            if(imageTest.length > 0) {
-                if(typeof imageTest[k] !== "undefined" && typeof imageTest[k].images !== "undefined" && imageTest[k] !== 'null') {
-                    if(typeof imageTest[k].images[2] !== "undefined") {
-                        console.log(imageTest.length);
-                        images.push(<img src={imageTest[k].images[2].url}></img>);
-                    }
-                }
+        const images = [];
+        const sourceArtist = [];
+        const ao = this.state.artistObject;
+        if(typeof ao !== "undefined" && typeof ao.images !== "undefined") {
+            sourceArtist[0] = 
+            <div> 
+                <h1>{ao.name}</h1>
+                <img src={ao.images[1].url}></img>
+            </div>;
+        }
+        if(this.state.spotArtists.length !== 0 && this.state.lastArtists.length !== 0) {    
+            for (var k = 0; k < this.state.lastArtists.length; k++)
+            {
+                    const last_results = this.state.lastArtists
+                    const spot_results = this.state.spotArtists
+                    //console.log(this.state.lastArtists);
+                    //console.log(this.state.spotArtists);
+                    if(typeof spot_results[k] !== "undefined" && typeof spot_results[k].images !== "undefined" && spot_results[k] !== 'null') {
+                        if(typeof spot_results[k].images[2] !== "undefined") {
+                            const artist_name = last_results[k].name;
+                            const artist_link = "/search/" + artist_name.replace(/\s/g, '+');
+                            console.log(spot_results.length);
+                            images.push(
+                                <div className="artist-container">
+                                    <Link to={{pathname:artist_link, state: spot_results[k]}} className="artist-link" key={artist_name}><img src={spot_results[k].images[2].url} key={spot_results[k].name}></img></Link>
+                                </div>
+                            );
+                        }
+                    }                
             }
-                
+        }
+        if(this.state.spotArtists.length !== 0 && this.state.lastArtists.length === 0){
+            for(var l = 0; l < this.state.spotArtists.length; l++) {
+                const spot_results = this.state.spotArtists;
+                const artist_name = spot_results[l].name;
+                const artist_link = "/search/" + artist_name.replace(/\s/g, '+');
+                images.push(
+                    <div className="artist-container">
+                        <Link to={{pathname:artist_link, state: spot_results[l]}} className="artist-link" key={artist_name}><img src={spot_results[l].images[2].url} key={spot_results[l].name}></img></Link>
+                    </div>
+                );
+            }
         }
 
 
         return (
             <div>
                 {/* <h1>{this.state.artist}</h1> */}
+                {sourceArtist}
                 {images}
             </div>
         );
