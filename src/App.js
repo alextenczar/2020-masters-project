@@ -38,7 +38,7 @@ class App extends Component{
       };
       localStorage.setItem('params', JSON.stringify(params));
       localStorage.setItem('expiry_time', expiryTime);
-      
+      this.forceUpdate();
     })
   }
   

@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import * as config from '../config/config.js';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import LastViz from './LastViz.js'
 
 const last_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=';
 const spot_search_url = 'https://api.spotify.com/v1/search?q=';
@@ -26,7 +27,7 @@ class SimilarArtists extends Component {
         return lastPromise;
     }
 
-    getSpotSearch = () => {
+    getSpotSearch = () => { //used for querying search artist and creating artist object
         const artistName = this.state.artist;
         if(spot_token === null) {
             setTimeout(() => { }, 100);
@@ -53,7 +54,7 @@ class SimilarArtists extends Component {
         this.getLast().then(({data}) => {
             this.setState({lastArtists: data.similarartists.artist.slice()}, () => {
                 var j = 0;
-                if(this.state.lastArtists.length === 0 && typeof this.state.artistObject !== 'undefined') {
+                if(this.state.lastArtists.length === 0 && typeof this.state.artistObject !== 'undefined') { //if last.fm didn't return any similar artists
                     const artist_id = this.state.artistObject.id;
                     promises.push(axios.get(`${spot_similar_url}${artist_id}/related-artists`, {
                         headers: {
@@ -68,7 +69,7 @@ class SimilarArtists extends Component {
                         });
                     }))
                 }
-                else if(this.state.lastArtists.length > 0) {
+                else if(this.state.lastArtists.length > 0) { //if last.fm returned any similar artists
                     for(var i = 0; i < this.state.lastArtists.length; i++) {
                         const similarQuery = this.state.lastArtists[i];
                         promises.push(axios.get(`${spot_search_url}${similarQuery.name}&type=artist&limit=1`, {
@@ -94,9 +95,10 @@ class SimilarArtists extends Component {
                             return null;
                         }))
                     }
-                    Promise.all(promises).then(() => { 
+                    Promise.all(promises).then(() => {  //set the states once all the responses are complete
                         console.log(tempSpotArtistArray);
                         console.log(tempLastArtistArray);
+                        console.log(promises);
                         this.setState({spotArtists: tempSpotArtistArray})
                         this.setState({lastArtists: tempLastArtistArray})
                     });
@@ -113,7 +115,7 @@ class SimilarArtists extends Component {
         });
     }
 
-    componentDidUpdate (newProps) {
+    componentDidUpdate (newProps) { //when a new artist is queried, execute the responses again
         if(this.props.artist != this.state.artist){
             this.setState({artist: this.props.artist}, () =>
             {
@@ -127,18 +129,18 @@ class SimilarArtists extends Component {
     
     render() {
         const images = [];
-        const sourceArtist = [];
         const ao = this.state.artistObject;
+        let lastViz;
+        let sourceArtist;
         if(typeof ao !== "undefined" && typeof ao.images !== "undefined") {
-            sourceArtist[0] = 
-            <div> 
-                <h1>{ao.name}</h1>
-                <img src={ao.images[1].url}></img>
-            </div>;
+            sourceArtist = 
+                <div key={ao.name}> 
+                    <h1>{ao.name}</h1>
+                    <img src={ao.images[1].url}></img>
+                </div>;
         }
-        if(this.state.spotArtists.length !== 0 && this.state.lastArtists.length !== 0) {    
-            for (var k = 0; k < this.state.lastArtists.length; k++)
-            {
+        if(this.state.spotArtists.length !== 0 && this.state.lastArtists.length !== 0) {    //if last.fm similar artists exist, render them.
+            for (var k = 0; k < this.state.lastArtists.length; k++) {
                     const last_results = this.state.lastArtists
                     const spot_results = this.state.spotArtists
                     //console.log(this.state.lastArtists);
@@ -149,21 +151,22 @@ class SimilarArtists extends Component {
                             const artist_link = "/search/" + artist_name.replace(/\s/g, '+');
                             console.log(spot_results.length);
                             images.push(
-                                <div className="artist-container">
+                                <div className="artist-container" key={artist_name}>
                                     <Link to={{pathname:artist_link, state: spot_results[k]}} className="artist-link" key={artist_name}><img src={spot_results[k].images[2].url} key={spot_results[k].name}></img></Link>
                                 </div>
                             );
                         }
                     }                
             }
+            lastViz = <LastViz results={this.state.lastArtists}></LastViz>
         }
-        if(this.state.spotArtists.length !== 0 && this.state.lastArtists.length === 0){
+        if(this.state.spotArtists.length !== 0 && this.state.lastArtists.length === 0){ //if last.fm similar artists don't exit, render spotify's similar artists.
             for(var l = 0; l < this.state.spotArtists.length; l++) {
                 const spot_results = this.state.spotArtists;
                 const artist_name = spot_results[l].name;
                 const artist_link = "/search/" + artist_name.replace(/\s/g, '+');
                 images.push(
-                    <div className="artist-container">
+                    <div className="artist-container" key={artist_name}>
                         <Link to={{pathname:artist_link, state: spot_results[l]}} className="artist-link" key={artist_name}><img src={spot_results[l].images[2].url} key={spot_results[l].name}></img></Link>
                     </div>
                 );
@@ -175,6 +178,7 @@ class SimilarArtists extends Component {
             <div>
                 {/* <h1>{this.state.artist}</h1> */}
                 {sourceArtist}
+                {lastViz}
                 {images}
             </div>
         );
