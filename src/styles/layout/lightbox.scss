@@ -1,0 +1,46 @@
+.lightbox {
+    margin:auto;
+    position: absolute;
+    z-index: 100;
+    width: 99vw;
+    height: 100vh;
+    overflow: hidden;
+    background-color: rgba(38,38,39,.8);
+    text-align: center;
+    transition: visibility .25s, opacity .25s linear;
+    .external-links {
+        padding-bottom: .5em;
+        a {
+            padding-right: .5em;
+            text-decoration: none;
+            font-weight: bolder;
+        }
+    }
+    .lightbox-title {
+        margin: 0;
+    }
+    .lightbox-container {
+        a{
+            padding-right: 1em;
+        }
+        margin:auto;
+        width:50%;
+        text-align: center;
+        .lightbox-image {
+            width: 400px;
+            height: 400px;
+            background-position: center; 
+            background-repeat: no-repeat; 
+            background-size: cover;
+            margin: 0 auto;
+            border-radius:6px;
+        }
+        ul{
+            h2 {
+                margin-bottom: 0;
+            }
+            list-style-type:none;
+            padding-left: 0;
+        }
+    }
+}
