@@ -1,4 +1,4 @@
-import { useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import axios from 'axios';
 import * as config from '../config/config.js';
 import React, { useState, useEffect } from 'react';
@@ -43,13 +43,13 @@ function Search(props) {
             <>
                 {/*<h1>{name_fixed}</h1><br></br>*/}
                 {/* <img src={spotArtistInfo.images[1].url}></img> */}
+                <Link to="/" id="back-link" key="back">Back</Link>
                 <SimilarArtists artist={name}></SimilarArtists>
             </>
         )
     }
     return (
         <>
-            <>{name_fixed}</>
         </>
     )
 };

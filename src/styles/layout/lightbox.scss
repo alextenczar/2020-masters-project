@@ -43,4 +43,14 @@
             padding-left: 0;
         }
     }
+    .track {
+        display: flex;
+        justify-content: center;
+        h3 {
+            height: 1em;
+        }
+        button {
+            height: 1em;
+        }
+    }
 }

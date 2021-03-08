@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import LastViz from './LastViz.js'
 import '../styles/layout/lightbox.scss';
+import '../styles/pages/similarArtist.scss'
 
 const last_similar_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=';
 const last_search_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=';
@@ -19,6 +20,7 @@ class SimilarArtists extends Component {
             artist: undefined,
             spotArtistObject: {},
             lastArtistObject: {},
+            spotTopTracks: [],
             lastArtists: [],
             spotArtists: [],
             lastFinalArtists: [],
@@ -45,7 +47,7 @@ class SimilarArtists extends Component {
         })
     }
 
-    getSpotSearch = () => { //used for querying search artist and creating artist object
+    getSpotSearch(){ //used for querying search artist and creating artist object
         const artistName = this.state.artist;
         if(spot_token === null) {
             setTimeout(() => { }, 100);
@@ -61,8 +63,31 @@ class SimilarArtists extends Component {
             if(typeof data.artists !== "undefined" && artistName !== "") {
                 this.setState({spotArtistObject: data.artists.items[0]});
                 console.log(data);
+                this.getSpotTopTracks();
             }
         })
+    }
+
+    getSpotTopTracks = () => {
+        if(spot_token === null) {
+            setTimeout(() => { }, 100);
+        }
+        if(typeof this.state.spotArtistObject.id !== 'undefined') {
+            const artistId = this.state.spotArtistObject.id;
+            axios.get(`${spot_similar_url}${artistId}/top-tracks?market=US`, {
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    Authorization: spot_token.token_type + " " + spot_token.access_token,
+                }
+            })
+            .then(({ data }) => {
+                if(typeof data.tracks !== "undefined" && artistId !== "") {
+                    this.setState({spotTopTracks: data.tracks});
+                    console.log(this.state.spotTopTracks);
+                }
+            })
+        }
     }
 
     getSpotSimilar = () => {
@@ -156,26 +181,61 @@ class SimilarArtists extends Component {
 
         console.log(this.state.spotArtistObject);
     }
+
+    async previewAudio(audio){
+        var track = document.getElementById(audio); 
+        var isPlaying = false;
+        if(track !== null){
+            track.volume= .1;
+            if(track.paused == true){
+                track.play();
+            }
+            else
+            {
+                track.pause();
+            }
+        }
+
+    }
     
     render() {
         const images = [];
         const genres = [];
+        const tracks = [];
         let lightbox;
         const sao = this.state.spotArtistObject;
         const lao = this.state.lastArtistObject;
+        const toptracks = this.state.spotTopTracks;
         let lastViz;
         let sourceArtist;
         if(typeof sao !== "undefined" && typeof sao.images !== "undefined" && typeof lao !== "undefined" && typeof lao.bio !== "undefined") {
             sao.genres.map((i) => {
                 genres.push(<li>{i}</li>)
             })
-            let last_link = <a href={lao.url}>Last.fm</a>
+            if(typeof toptracks !== "undefined") {
+                toptracks.map((g) => {
+                    if(g.preview_url !== null){
+                        tracks.push(
+                            <div className="track">
+                                <button className="preview-button"onClick={() => {this.previewAudio(g.name)}}></button>
+                                <h3>{g.name}</h3>
+                                <audio id={g.name}>
+                                    <source src={g.preview_url} type="audio/mpeg"></source>
+                                </audio>
+                            </div>
+                        )
+                    }
+                })
+            }
+            
+
+            let last_link = <a id="last_link" href={lao.url}>Last.fm</a>
             let spot_link = <a href={sao.external_urls.spotify}>Spotify</a>
             sourceArtist = 
                 <div key={sao.name}> 
-                    <h1 onClick={this.showLightbox}>{sao.name}</h1>
+                    <h1 id="artist-title" onClick={this.showLightbox} style={{ visibility: this.state.lightboxVisibility ? "hidden" : "visible", opacity: this.state.lightboxVisibility ? "0" : "1"}}>{sao.name}</h1>
                     <div className="lightbox" style={{ visibility: this.state.lightboxVisibility ? "visible" : "hidden", opacity: this.state.lightboxVisibility ? "1" : "0"}}>
-                        <h1 className="lightbox-title">{sao.name}</h1>
+                        <h1 className="lightbox-title" onClick={this.showLightbox}>{sao.name}</h1>
                         <div className="external-links">
                             {last_link}
                             {spot_link}
@@ -183,30 +243,38 @@ class SimilarArtists extends Component {
                         <div className="lightbox-container">
                             <div className="lightbox-image" style={{backgroundImage: `url(${sao.images[1].url})`}}></div>
                                 <div className="artist_info">
-                                <ul>                           
+                                <ul>    
+                                    {tracks}                       
                                     <h2>Genre(s)</h2>
                                     {genres}
                                 </ul>
                             </div>
                         </div>
                     </div>
-                </div>;
+                </div>
         }
         if(this.state.spotFinalArtists.length !== 0 && this.state.lastFinalArtists.length !== 0) {    //if last.fm similar artists exist, render them.
+            var lowest = 1;
+            const last_results = this.state.lastFinalArtists
+            const spot_results = this.state.spotFinalArtists
             for (var k = 0; k < this.state.lastArtists.length; k++) {
-                    const last_results = this.state.lastFinalArtists
-                    const spot_results = this.state.spotFinalArtists
+                    if(typeof last_results[k] !== 'undefined') {
+                        if(last_results[k].match < lowest) {
+                            lowest = last_results[k].match
+                        }
+                    }
+
                     //console.log(this.state.lastArtists);
                     //console.log(this.state.spotArtists);
-                    if(typeof spot_results[k] !== "undefined" && typeof spot_results[k].images !== "undefined" && spot_results[k] !== 'null') {
+                    if(typeof last_results[k] !== "undefined" && typeof spot_results[k] !== "undefined" && typeof spot_results[k].images !== "undefined" && spot_results[k] !== 'null') {
                         if(typeof spot_results[k].images[2] !== "undefined") {
                             const artist_name = last_results[k].name;
                             const artist_link = "/search/" + artist_name.replace(/\s/g, '+');
-                            console.log(spot_results.length);
                         }
                     }                
             }
-            lastViz = <LastViz lastResults={this.state.lastFinalArtists} spotResults={this.state.spotFinalArtists}></LastViz>
+            console.log(lowest);
+            lastViz = <LastViz lastResults={this.state.lastFinalArtists} lowest={lowest} spotResults={this.state.spotFinalArtists}></LastViz>
         }
         if(this.state.spotArtists.length !== 0 && this.state.lastArtists.length === 0){ //if last.fm similar artists don't exit, render spotify's similar artists.
             for(var l = 0; l < this.state.spotArtists.length; l++) {

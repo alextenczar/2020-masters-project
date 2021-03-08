@@ -27,7 +27,6 @@ class App extends Component{
     }
   }
   componentDidMount() {
-    this.returnThemeBasedOnOS();
     var token = getSpotifyToken();
     token.then((response) => {
       const expiryTime = new Date().getTime() + response.expires_in * 1000;

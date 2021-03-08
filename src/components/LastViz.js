@@ -1,14 +1,20 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import {useD3} from '../hooks/UseD3.js';
-import { Link } from 'react-router-dom';
-import { scaleSqrt } from 'd3';
+import { Link, Redirect, useHistory } from 'react-router-dom';
+import { drag, scaleSqrt, schemeGnBu } from 'd3';
 
 function LastViz(props) {
     console.log(props.lastResults);
     console.log(props.spotResults);
     const dataa = props.spotResults;
+    const lowest = props.lowest;
+    const history = useHistory();
     //const data = props.lastResults;
+    const redirect = d => {
+      history.push(d);
+    }
+
     const data = props.lastResults.map(d => ({
       ...d,
       x: 900,
@@ -16,12 +22,12 @@ function LastViz(props) {
     }))
         const ref = useD3(
             (svg) => {
-              const height = 1500;
-              const width = 1500;
+              const height = 1000;
+              const width = 1000;
               const margin = { top: 20, right: 30, bottom: 30, left: 40 };
               const center = { x: width/2, y: height/2 };
             
-            var distanceScale = d3.scaleSqrt().domain([0, 1]).range([5, 80])
+            var distanceScale = d3.scaleSqrt().domain([lowest, 1]).range([30, 70])
 
             var defs = svg.append("defs");
 
@@ -35,12 +41,23 @@ function LastViz(props) {
               .style("position", "absolute")
               .style("color", "white")
 
+            var handleDrag = function(d) {
+              d3.select(this)
+                .style("cursor", "grabbing")
+            }
+
+            var handleMouseUp = function(d) {
+              d3.select(this)
+                .style("cursor", "grab")
+            }
+
+
             var mouseover = function(d) {
               Tooltip
                 .style("opacity", 1)
               d3.select(this)
                 .style("stroke", "black")
-                .style("opacity", .5)
+                .style("opacity", 1)
                 .style("cursor", "pointer")
             }
             var mousemove = function(event,d) {
@@ -57,7 +74,11 @@ function LastViz(props) {
                 .style("opacity", 1)
             }
 
-            var circles = svg.selectAll(".artist")
+            var g = svg.append("g")
+              .attr("class", "everything")
+  
+
+            var circles = g.selectAll(".artist")
               .data(data)
               .enter().append("circle")
               .attr("class", "artist")
@@ -70,10 +91,16 @@ function LastViz(props) {
               .on("mouseover", mouseover)
               .on("mousemove", mousemove)
               .on("mouseleave", mouseleave)
+              .on("mousedown", function(d) {
+                Tooltip
+                  .style('opacity', 0)
+              })
               .on("click", function(d){
                 const artist = d.target.__data__;
                 const artist_link = "/search/" + artist.name.replace(/\s/g, '+');
-                window.location.href = artist_link;
+                d3.selectAll("svg > *").remove();
+                d3.selectAll(".tooltip").remove();
+                redirect(artist_link);
               })
               
 
@@ -94,7 +121,7 @@ function LastViz(props) {
               .attr("object-fit", "cover")
               .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
               .attr("xlink:href", function(d){
-                var imageUrl = d.images[1]
+                var imageUrl = d.images[0]
                 if(imageUrl != null){
                   return imageUrl.url;
                 }
@@ -102,7 +129,7 @@ function LastViz(props) {
               
               // charge is dependent on size of the bubble, so bigger towards the middle
               function charge(d) {
-                return Math.pow(distanceScale(d.match), 2.0) * 0.01
+                return Math.pow(distanceScale(d.match), 2.0) * 0.03
               }
 
             var simulation = d3.forceSimulation()
@@ -119,6 +146,21 @@ function LastViz(props) {
               simulation.nodes(data)
               .on('tick', ticked)
             }
+            
+            function drawChart() {
+              var currentWidth = parseInt(d3.select('#div_template').style('width'), 10)
+              svg.attr("width", currentWidth)
+            }
+
+
+            var zoom_handler = d3.zoom()
+               .on("zoom", zoom_actions);
+
+            zoom_handler(svg);
+
+            function zoom_actions(event){
+              g.attr("transform", event.transform)
+            }
 
 
             function ticked() {
@@ -130,6 +172,8 @@ function LastViz(props) {
                   return d.y
                 })
             }
+            drawChart()
+            window.addEventListener('resize', drawChart );
 
         },
         [data.length]
@@ -139,21 +183,22 @@ function LastViz(props) {
 
         return (
           <div id="div_template">
-            <svg
-              ref={ref}
-              style={{
-                height: (window.innerHeight - 100),
-                width: '100%',  
-                marginRight: "0px",
-                marginLeft: "0px",
-              }}
-              viewBox="0 0 1500 1500"
-              preserveAspectRatio="xMidYMid meet"
-            >
-              <defs>
-                
-              </defs>
-            </svg>
+              <svg
+                id="map"
+                ref={ref}
+                style={{
+                  height: (window.innerHeight),  
+                  marginRight: "0px",
+                  marginLeft: "0px",
+                  cursor: "grab",
+                }}
+                viewBox="0 0 1000 1000"
+                preserveAspectRatio="xMidYMid meet"
+              >
+                <defs>
+                  
+                </defs>
+              </svg>
           </div>
           );
 

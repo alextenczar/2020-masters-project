@@ -1,4 +1,7 @@
 @import '../colors';
+html {
+    background-color: $background-dark;
+}
 body {
     &.light{
         color: $text-light;
@@ -19,7 +22,7 @@ body {
         }
         
     }
-    &.dark{
+    &{
         color: $text-dark;
         background-color: $background-dark;
         -webkit-font-smoothing: antialiased;

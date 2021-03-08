@@ -87,21 +87,29 @@ class SearchBar extends Component {
         const last_results = this.state.last_results
         const spot_results = this.state.spot_results
         const suggestions = [] 
+        var searchBox = document.getElementById("search-box");
+        var suggestionBox = document.getElementById("suggestion-box");
         for (var i = 0; i < 6; i++) {
             for(var k = 0; k < 50; k++) {
                 if(typeof last_results[i] !== "undefined" && typeof spot_results[k] !== "undefined" && last_results[i].listeners > 500 && last_results[i].name.toUpperCase() === spot_results[k].name.toUpperCase()){
+                    searchBox.classList.add("populated");
+                    suggestionBox.classList.add("populated");
                     const artist_name = last_results[i].name;
                     const artist_link = "/search/" + artist_name.replace(/\s/g, '+');
                     suggestions.push(<Link to={{pathname:artist_link, state: spot_results[k]}} className="artist-link" key={artist_name}>{artist_name}</Link>);
                     break;
                 }
             }
+            if(suggestions.length == 0 && searchBox !== null && suggestionBox !== null){
+                searchBox.classList.remove("populated");
+                suggestionBox.classList.remove("populated");
+            }
         }
      
         return (
             <form id="home-search" onSubmit={this.handleSubmit}>
-                <input type="text" value={this.state.search} onChange={this.handleChange} />
-                <div className="suggestions-container">
+                <input id="search-box" type="text" value={this.state.search} onChange={this.handleChange} />
+                <div id="suggestion-box" className="suggestions-container">
                     {suggestions}
                 </div>
             </form>

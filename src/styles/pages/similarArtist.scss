@@ -1,0 +1,16 @@
+#artist-title {
+    text-align: center;
+    z-index: 1;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background-color: rgba(0,0,0,.5);
+    padding: .25em;
+    border-radius: 10px;
+}
+body {
+    overflow: hidden;
+}
+#last_link:hover {
+        color: #d92323;
+}

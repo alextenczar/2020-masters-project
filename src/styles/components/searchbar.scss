@@ -1,9 +1,30 @@
 #home-search{
     input {
         background-color: #171717;
+        color: white;
+        font-size: 2em;
+        border-radius: 10px;
+        border-color: transparent;
+        padding: .1em .25em;
+        &.populated {
+            border-radius: 10px 10px 0px 0px;
+            border-bottom-color: rgba(255,255,255,.1);
+        }
     }
+
 }
 .suggestions-container {
     background-color: #171717;
-    a {display: block;}
+    a {
+        display: block;
+        text-decoration: none;
+    }
+    padding: .75em .75em .75em .75em;
+    border-radius: 0px 0px 10px 10px;
+}
+#suggestion-box {
+    display: none;
+    &.populated{
+        display: block;
+    }
 }
