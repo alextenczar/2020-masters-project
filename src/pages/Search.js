@@ -3,6 +3,7 @@ import axios from 'axios';
 import * as config from '../config/config.js';
 import React, { useState, useEffect } from 'react';
 import SimilarArtists from '../components/SimilarArtists.js';
+import '../styles/pages/search.scss';
 
 function Search(props) {
     const { name } = useParams();

@@ -3,6 +3,7 @@ html {
     background-color: $background-dark;
 }
 body {
+    margin: 0;
     &.light{
         color: $text-light;
         background-color: $background-light;

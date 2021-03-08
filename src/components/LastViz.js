@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import {useD3} from '../hooks/UseD3.js';
-import { Link, Redirect, useHistory } from 'react-router-dom';
+import { Link, Redirect, useHistory , useLocation} from 'react-router-dom';
 import { drag, scaleSqrt, schemeGnBu } from 'd3';
 
 function LastViz(props) {
@@ -10,10 +10,16 @@ function LastViz(props) {
     const dataa = props.spotResults;
     const lowest = props.lowest;
     const history = useHistory();
+    const location = useLocation()
     //const data = props.lastResults;
     const redirect = d => {
       history.push(d);
     }
+
+    React.useEffect(() => {
+      d3.selectAll("svg > *").remove();
+      d3.selectAll(".tooltip").remove();
+    }, [location])
 
     const data = props.lastResults.map(d => ({
       ...d,
@@ -98,8 +104,6 @@ function LastViz(props) {
               .on("click", function(d){
                 const artist = d.target.__data__;
                 const artist_link = "/search/" + artist.name.replace(/\s/g, '+');
-                d3.selectAll("svg > *").remove();
-                d3.selectAll(".tooltip").remove();
                 redirect(artist_link);
               })
               

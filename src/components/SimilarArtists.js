@@ -52,7 +52,7 @@ class SimilarArtists extends Component {
         if(spot_token === null) {
             setTimeout(() => { }, 100);
         }
-        axios.get(`${spot_search_url}${artistName}&type=artist&limit=1`, {
+        axios.get(`${spot_search_url}${artistName}&type=artist&limit=10`, {
             headers: {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
@@ -61,7 +61,13 @@ class SimilarArtists extends Component {
         })
         .then(({ data }) => {
             if(typeof data.artists !== "undefined" && artistName !== "") {
-                this.setState({spotArtistObject: data.artists.items[0]});
+                const name_fixed = this.state.artist.replace(/\+/g, ' ');
+                for(var k = 0; k < data.artists.items.length; k++) {
+                    if(data.artists.items[k].name.toUpperCase().localeCompare(name_fixed.toUpperCase()) == 0) {
+                        this.setState({spotArtistObject: data.artists.items[k]});
+                        break;
+                    }
+                }
                 console.log(data);
                 this.getSpotTopTracks();
             }
