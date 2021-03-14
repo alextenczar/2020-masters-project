@@ -96,12 +96,25 @@ class SimilarArtists extends Component {
         }
     }
 
+    compare(a,b) {
+        const matchA = a.match;
+        const matchB = b.match;
+
+        let comparison = 0;
+        if (matchA < matchB) {
+          comparison = 1;
+        } else if (matchA > matchB) {
+          comparison = -1;
+        }
+        return comparison;
+    }
+
     getSpotSimilar = () => {
         const tempLastArtistArray = []
         const tempSpotArtistArray = []
         const promises = []
         this.getLast().then(({data}) => {
-            this.setState({lastArtists: data.similarartists.artist.slice()}, () => {
+            this.setState({lastArtists: data.similarartists.artist.slice().sort(this.compare)}, () => {
                 var j = 0;
                 if(this.state.lastArtists.length === 0 && typeof this.state.spotArtistObject !== 'undefined') { //if last.fm didn't return any similar artists
                     const artist_id = this.state.spotArtistObject.id;
@@ -119,7 +132,7 @@ class SimilarArtists extends Component {
                     }))
                 }
                 else if(this.state.lastArtists.length > 0) { //if last.fm returned any similar artists
-                    for(var i = 0; i < this.state.lastArtists.length; i++) {
+                    for(var i = 0; i < 55; i++) {
                         const similarQuery = this.state.lastArtists[i];
                         promises.push(axios.get(`${spot_search_url}${similarQuery.name}&type=artist&limit=1`, {
                             headers: {
@@ -148,6 +161,7 @@ class SimilarArtists extends Component {
                         console.log(tempSpotArtistArray);
                         console.log(tempLastArtistArray);
                         console.log(promises);
+                        console.log(this.state.lastArtists);
                         this.setState({spotFinalArtists: tempSpotArtistArray})
                         this.setState({lastFinalArtists: tempLastArtistArray})
                     });

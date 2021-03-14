@@ -53,9 +53,15 @@ function LastViz(props) {
             .force("y", d3.forceY(height / 2).strength(0.05).y(center.y))
             .force("collide", d3.forceCollide(function(d){
               return distanceScale(d.match);}))
-            .stop();
+            //.stop(); //used for static viz
 
-          for (var i = 0; i < 300; ++i) {simulation.tick();}
+            if(data !== null)
+            {
+              simulation.nodes(data)
+              .on('tick', ticked)
+            }
+
+          //for (var i = 0; i < 300; ++i) {simulation.tick();} // for static viz
 
           var Tooltip = d3.select("#div_template")
             .append("div")
@@ -126,8 +132,8 @@ function LastViz(props) {
               const artist_link = "/search/" + artist.name.replace(/\s/g, '+');
               redirect(artist_link);
             })
-            .attr("cx", function(d) { return d.x })
-            .attr("cy", function(d) { return d.y })
+            //.attr("cx", function(d) { return d.x })
+            //.attr("cy", function(d) { return d.y })
               
 
             defs.selectAll(".artist-pattern")
@@ -173,7 +179,9 @@ function LastViz(props) {
             var process = 1;
             function ticked() {
               if(process === 1) {
-
+                circles
+                .attr("cx", function(d) { return d.x })
+                .attr("cy", function(d) { return d.y })
               }
               process = 1 - process;
             }
