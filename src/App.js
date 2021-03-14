@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Switch, Route} from 'react-router-dom';
+import { Switch, Route, withRouter} from 'react-router-dom';
 import Search from './pages/Search.js';
 import Home from './pages/Home.js';
 import { getSpotifyToken } from './config/functions';
@@ -46,9 +46,9 @@ class App extends Component{
     let search;
 
     if(JSON.parse(localStorage.getItem('params')) !== null){
-      home = <Route path='/' exact component={Home} />;
-      search = <Route path='/search/:name' exact component={Search} />;
-      console.log(JSON.parse(localStorage.getItem('params')));
+      const spot_token = JSON.parse(localStorage.getItem('params'));
+      home = <Route exact path='/' render={(props) => <Home type={spot_token.token_type} token={spot_token.access_token}/>} />;
+      search = <Route path='/search/:name' render={(props) => <Search type={spot_token.token_type} token={spot_token.access_token}/>}/>;
     }
     return (
       <div className="wrapper">

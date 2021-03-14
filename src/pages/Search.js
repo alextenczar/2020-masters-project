@@ -12,7 +12,6 @@ function Search(props) {
     const name_fixed = name.replace(/\+/g, ' ');
     const last_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=';
     const spot_url = 'https://api.spotify.com/v1/search?q=';
-    const spot_results = props.location.state;
     const spot_token = JSON.parse(localStorage.getItem('params'));
     
     useEffect(() => {
@@ -27,7 +26,7 @@ function Search(props) {
             headers: {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
-                Authorization: spot_token.token_type + " " + spot_token.access_token,
+                Authorization: props.type + " " + props.token,
             }
         })
         .then(({ data }) => {
@@ -44,7 +43,7 @@ function Search(props) {
                 {/*<h1>{name_fixed}</h1><br></br>*/}
                 {/* <img src={spotArtistInfo.images[1].url}></img> */}
                 <Link to="/" id="back-link" key="back">Back</Link>
-                <SimilarArtists artist={name}></SimilarArtists>
+                <SimilarArtists artist={name} type={props.type} token={props.token}></SimilarArtists>
             </>
         )
     }

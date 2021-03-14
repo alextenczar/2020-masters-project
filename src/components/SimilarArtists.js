@@ -42,7 +42,6 @@ class SimilarArtists extends Component {
         .then(({ data }) => {
             if(typeof data.artist !== "undefined") {
                 this.setState({lastArtistObject: data.artist});
-                console.log(data.artist)
             }
         })
     }
@@ -56,7 +55,7 @@ class SimilarArtists extends Component {
             headers: {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
-                Authorization: spot_token.token_type + " " + spot_token.access_token,
+                Authorization: this.props.type + " " + this.props.token,
             }
         })
         .then(({ data }) => {
@@ -84,7 +83,7 @@ class SimilarArtists extends Component {
                 headers: {
                     "Accept": "application/json",
                     "Content-Type": "application/json",
-                    Authorization: spot_token.token_type + " " + spot_token.access_token,
+                    Authorization: this.props.type + " " + this.props.token,
                 }
             })
             .then(({ data }) => {
@@ -122,7 +121,7 @@ class SimilarArtists extends Component {
                         headers: {
                             "Accept": "application/json",
                             "Content-Type": "application/json",
-                            Authorization: spot_token.token_type + " " + spot_token.access_token,
+                            Authorization: this.props.type + " " + this.props.token,
                         }
                     }).then(({data}) => {
                         Promise.all(promises).then(() => { 
@@ -138,7 +137,7 @@ class SimilarArtists extends Component {
                             headers: {
                                 "Accept": "application/json",
                                 "Content-Type": "application/json",
-                                Authorization: spot_token.token_type + " " + spot_token.access_token,
+                                Authorization: this.props.type + " " + this.props.token,
                             }
                         })
                         .then(({ data }) => {
