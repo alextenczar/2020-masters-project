@@ -9,11 +9,11 @@ body {
         background-color: $background-light;
         ::selection {
             color: $background-light;
-            background: $accent-light; /* WebKit/Blink Browsers */
+            background: $accent-light; 
         }
         ::-moz-selection {
             color: $background-light;
-            background: $accent-light; /* Gecko Browsers */
+            background: $accent-light;
         }
         a, a:visited {
             color: $text-light;
@@ -30,11 +30,11 @@ body {
         -moz-osx-font-smoothing: grayscale;
         ::selection {
             color: $background-dark;
-            background: $accent-dark; /* WebKit/Blink Browsers */
+            background: $accent-dark;
           }
         ::-moz-selection {
         color: $background-dark;
-        background: $accent-dark; /* Gecko Browsers */
+        background: $accent-dark; 
         }
         a, a:visited {
             color: $text-dark;

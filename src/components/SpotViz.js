@@ -7,27 +7,19 @@ import '../styles/pages/viz.scss';
 
 function LastViz(props) {
     const spotify_data = props.spotResults;
-    const last_data = props.lastResults;
-    const lowest = props.lowest;
     const history = useHistory();
-    const uselocation = useLocation();
-    const artist = props.artist;
-    const test = Date.now();
+    const location = useLocation();
     //const data = props.lastResults;
     const redirect = d => {
       history.push(d);
     }
 
-    window.onpopstate = function() {
-      window.location.reload(true);
-    };
-
     React.useEffect(() => {
       d3.selectAll("svg > *").remove();
       d3.selectAll(".tooltip").remove();
-    }, [uselocation])
-
-    const data = last_data.map(d => ({
+    }, [location])
+    console.log(spotify_data);
+    const data = spotify_data.map(d => ({
       ...d,
       x: 900,
       y: 900
@@ -39,7 +31,7 @@ function LastViz(props) {
               const margin = { top: 20, right: 30, bottom: 30, left: 40 };
               const center = { x: width/2, y: height/2 };
               
-            var distanceScale = d3.scaleSqrt().domain([lowest, 1]).range([30, 70])
+            var distanceScale = d3.scaleSqrt().domain([0, 1]).range([30, 70])
             var defs = svg.append("defs");
 
             var Tooltip = d3.select("#div_template")
@@ -67,13 +59,13 @@ function LastViz(props) {
               Tooltip
                 .style("opacity", 1)
               d3.select(this)
-                .style("stroke", "white")
+                .style("stroke", "black")
                 .style("opacity", 1)
                 .style("cursor", "pointer")
             }
             var mousemove = function(event,d) {
               Tooltip
-                .html(d.name + "<br>Similarity: " + (d.match * 100).toFixed(2) + "%")
+                .html(d.name + "<br>Popularity: " + d.popularity)
                 .style("left", (event.pageX+20) + "px")
                 .style("top", (event.pageY) + "px")
             }
@@ -94,7 +86,7 @@ function LastViz(props) {
               .enter().append("circle")
               .attr("class", "artist")
               .attr("r", function(d){
-                return distanceScale(d.match);
+                return distanceScale(d.popularity/100);
               })
               .attr("fill", function(d, i) {
                 return "url(#" + d.name.toLowerCase().replace(/[ "']/g, "+") + ")";
@@ -114,7 +106,7 @@ function LastViz(props) {
               
 
             defs.selectAll(".artist-pattern")
-              .data(spotify_data)
+              .data(data)
               .enter().append("pattern")
               .attr("class", "artist-pattern")
               .attr("id", function(d){
@@ -138,7 +130,7 @@ function LastViz(props) {
               
               // charge is dependent on size of the bubble, so bigger towards the middle
               function charge(d) {
-                return Math.pow(distanceScale(d.match), 2.0) * 0.03
+                return Math.pow(distanceScale(d.popularity/100), 2.0) * 0.05
               }
 
             var simulation = d3.forceSimulation()
@@ -146,7 +138,7 @@ function LastViz(props) {
               .force("x", d3.forceX(width / 2).strength(0.05).x(center.x))
               .force("y", d3.forceY(height / 2).strength(0.05).y(center.y))
               .force("collide", d3.forceCollide(function(d){
-                return distanceScale(d.match);
+                return distanceScale(d.popularity/100);
               }))
             
 
@@ -185,7 +177,7 @@ function LastViz(props) {
             window.addEventListener('resize', drawChart );
 
         },
-        [last_data]
+        [spotify_data]
       );
 
     

@@ -6,12 +6,12 @@
         border-radius: 10px;
         border-color: transparent;
         padding: .1em .25em;
+        outline: none;
         &.populated {
             border-radius: 10px 10px 0px 0px;
             border-bottom-color: rgba(255,255,255,.1);
         }
     }
-
 }
 .suggestions-container {
     background-color: #171717;

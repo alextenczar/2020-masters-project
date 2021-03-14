@@ -1,15 +1,16 @@
 import React, {Component} from 'react';
 import * as config from '../config/config.js';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
-import LastViz from './LastViz.js'
+import { Link, Redirect, useHistory , useLocation} from 'react-router-dom';
+import LastViz from './LastViz.js';
+import SpotViz from './SpotViz';
 import '../styles/layout/lightbox.scss';
-import '../styles/pages/similarArtist.scss'
+import '../styles/pages/similarArtist.scss';
 
 const last_similar_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=';
 const last_search_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=';
 const spot_search_url = 'https://api.spotify.com/v1/search?q=';
-const spot_similar_url = 'https://api.spotify.com/v1/artists/'
+const spot_similar_url = 'https://api.spotify.com/v1/artists/';
 const last_key = config.keys.last_api_key;
 const spot_token = JSON.parse(localStorage.getItem('params'));
 
@@ -188,7 +189,7 @@ class SimilarArtists extends Component {
         console.log(this.state.spotArtistObject);
     }
 
-    async previewAudio(audio){
+    previewAudio(audio){
         var track = document.getElementById(audio); 
         var isPlaying = false;
         if(track !== null){
@@ -207,31 +208,37 @@ class SimilarArtists extends Component {
     render() {
         const images = [];
         const genres = [];
-        const tracks = [];
+        var tracks = [];
         let lightbox;
         const sao = this.state.spotArtistObject;
         const lao = this.state.lastArtistObject;
         const toptracks = this.state.spotTopTracks;
-        let lastViz;
+        let viz;
         let sourceArtist;
         if(typeof sao !== "undefined" && typeof sao.images !== "undefined" && typeof lao !== "undefined" && typeof lao.bio !== "undefined") {
-            sao.genres.map((i) => {
-                genres.push(<li>{i}</li>)
-            })
+            for(var i = 0; i < sao.genres.length; i++) {
+                genres.push(<li>{sao.genres[i]}</li>)
+            }
             if(typeof toptracks !== "undefined") {
-                toptracks.map((g) => {
-                    if(g.preview_url !== null){
+                console.log(toptracks);
+                var track_count = 0;
+                for(var i = 0; i < toptracks.length; i++) {
+                    if(track_count === 3){break;}
+                    if(toptracks[i].preview_url !== null){
+                        track_count++;
+                        const track = toptracks[i];
+                        console.log(tracks)
                         tracks.push(
                             <div className="track">
-                                <button className="preview-button"onClick={() => {this.previewAudio(g.name)}}></button>
-                                <h3>{g.name}</h3>
-                                <audio id={g.name}>
-                                    <source src={g.preview_url} type="audio/mpeg"></source>
+                                <button className="preview-button" onClick={() => {this.previewAudio(track.name)}}>{track.name}</button>
+                                <h3>{track.name}</h3>
+                                <audio id={track.name} controls>
+                                    <source src={track.preview_url} id={track.name} type="audio/mpeg"></source>
                                 </audio>
                             </div>
                         )
                     }
-                })
+                }
             }
             
 
@@ -259,7 +266,7 @@ class SimilarArtists extends Component {
                     </div>
                 </div>
         }
-        if(this.state.spotFinalArtists.length !== 0 && this.state.lastFinalArtists.length !== 0) {    //if last.fm similar artists exist, render them.
+        if(this.state.spotFinalArtists.length > 1 && this.state.spotFinalArtists.length === this.state.lastFinalArtists.length) {    //if last.fm similar artists exist, render them.
             var lowest = 1;
             const last_results = this.state.lastFinalArtists
             const spot_results = this.state.spotFinalArtists
@@ -269,9 +276,6 @@ class SimilarArtists extends Component {
                             lowest = last_results[k].match
                         }
                     }
-
-                    //console.log(this.state.lastArtists);
-                    //console.log(this.state.spotArtists);
                     if(typeof last_results[k] !== "undefined" && typeof spot_results[k] !== "undefined" && typeof spot_results[k].images !== "undefined" && spot_results[k] !== 'null') {
                         if(typeof spot_results[k].images[2] !== "undefined") {
                             const artist_name = last_results[k].name;
@@ -280,14 +284,17 @@ class SimilarArtists extends Component {
                     }                
             }
             console.log(lowest);
-            lastViz = <LastViz lastResults={this.state.lastFinalArtists} lowest={lowest} spotResults={this.state.spotFinalArtists}></LastViz>
+            console.log(this.state.lastFinalArtists)
+            console.log(this.state.spotFinalArtists)
+            viz = <LastViz lastResults={this.state.lastFinalArtists} artist = {this.state.spotArtistObject} lowest={lowest} spotResults={this.state.spotFinalArtists}></LastViz>
         }
-        if(this.state.spotArtists.length !== 0 && this.state.lastArtists.length === 0){ //if last.fm similar artists don't exit, render spotify's similar artists.
+        if(this.state.spotArtists.length !== 0 && this.state.lastArtists.length === 0){ //if last.fm similar artists don't exist, render spotify's similar artists.
             for(var l = 0; l < this.state.spotArtists.length; l++) {
                 const spot_results = this.state.spotArtists;
                 const artist_name = spot_results[l].name;
                 const artist_link = "/search/" + artist_name.replace(/\s/g, '+');
             }
+            viz = <SpotViz spotResults={this.state.spotArtists}></SpotViz>
         }
 
 
@@ -295,8 +302,7 @@ class SimilarArtists extends Component {
             <div>
                 {lightbox}
                 {sourceArtist}
-                {lastViz}
-                {images}
+                {viz}
             </div>
         );
     }
