@@ -29,8 +29,8 @@ function LastViz(props) {
 
     const data = last_data.map(d => ({
       ...d,
-      x: 500,
-      y: 500
+      x: Math.random() * 900,
+      y: Math.random() * 900
     }))
         const ref = useD3(
             (svg) => {
@@ -44,22 +44,20 @@ function LastViz(props) {
 
             // charge is dependent on size of the bubble, so bigger towards the middle
             function charge(d) {
-              return Math.pow(distanceScale(d.match), 2.0) * 0.01
+              return -Math.pow(distanceScale(d.match), 2.0) * .3;
             }
 
           var simulation = d3.forceSimulation(data)
+            .velocityDecay(0.25)
+            .force("x", d3.forceX(width / 2).strength(.3).x(center.x))
+            .force("y", d3.forceY(height / 2).strength(.3).y(center.y))
             .force('charge', d3.forceManyBody().strength(charge))
-            .force("x", d3.forceX(width / 2).strength(0.05).x(center.x))
-            .force("y", d3.forceY(height / 2).strength(0.05).y(center.y))
             .force("collide", d3.forceCollide(function(d){
-              return distanceScale(d.match);}))
+              return distanceScale(d.match * 1.1);
+            }))
+            .on('tick', ticked)
             //.stop(); //used for static viz
 
-            if(data !== null)
-            {
-              simulation.nodes(data)
-              .on('tick', ticked)
-            }
 
           //for (var i = 0; i < 300; ++i) {simulation.tick();} // for static viz
 
@@ -115,7 +113,7 @@ function LastViz(props) {
             .enter().append("circle")
             .attr("class", "artist")
             .attr("r", function(d){
-              return distanceScale(d.match);
+              return 0;
             })
             .attr("fill", function(d, i) {
               return "url(#" + d.name.toLowerCase().replace(/[ "']/g, "+") + ")";
@@ -134,7 +132,15 @@ function LastViz(props) {
             })
             //.attr("cx", function(d) { return d.x })
             //.attr("cy", function(d) { return d.y })
-              
+          
+          circles.transition()
+            .duration(3000)
+            .attr('r', function(d) {return distanceScale(d.match); });
+
+            if(data !== null)
+            {
+              simulation.nodes(data);
+            }
 
             defs.selectAll(".artist-pattern")
               .data(spotify_data)
@@ -153,7 +159,7 @@ function LastViz(props) {
               .attr("object-fit", "cover")
               .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
               .attr("xlink:href", function(d){
-                var imageUrl = d.images[2]
+                var imageUrl = d.images[1]
                 if(imageUrl != null){
                   return imageUrl.url;
                 }
@@ -184,6 +190,7 @@ function LastViz(props) {
                 .attr("cy", function(d) { return d.y })
               }
               process = 1 - process;
+              console.log(process);
             }
             drawChart()
             window.addEventListener('resize', drawChart );

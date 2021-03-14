@@ -122,7 +122,7 @@ function LastViz(props) {
               .attr("object-fit", "cover")
               .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
               .attr("xlink:href", function(d){
-                var imageUrl = d.images[0]
+                var imageUrl = d.images[1]
                 if(imageUrl != null){
                   return imageUrl.url;
                 }
