@@ -1,4 +1,5 @@
 #home-search{
+    animation: fadein 2s;
     input {
         background-color: #171717;
         color: white;
@@ -27,4 +28,9 @@
     &.populated{
         display: block;
     }
+}
+
+@keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }

@@ -42,14 +42,22 @@ class App extends Component{
   }
   
   render() {
+    let home;
+    let search;
+
+    if(typeof JSON.parse(localStorage.getItem('params')) !== undefined){
+      home = <Route path='/' exact component={Home} />;
+      search = <Route path='/search/:name' exact component={Search} />;
+      console.log("all set");
+    }
     return (
       <div className="wrapper">
         <header className="app-header">
   
         </header>
         <Switch>
-            <Route path='/' exact component={Home} />
-            <Route path='/search/:name' exact component={Search} />
+            {home}
+            {search}
         </Switch>
         <footer className="app-footer">
 

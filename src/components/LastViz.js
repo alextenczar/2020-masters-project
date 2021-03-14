@@ -29,8 +29,8 @@ function LastViz(props) {
 
     const data = last_data.map(d => ({
       ...d,
-      x: 900,
-      y: 900
+      x: 500,
+      y: 500
     }))
         const ref = useD3(
             (svg) => {
@@ -44,7 +44,7 @@ function LastViz(props) {
 
             // charge is dependent on size of the bubble, so bigger towards the middle
             function charge(d) {
-              return Math.pow(distanceScale(d.match), 2.0) * 0.03
+              return Math.pow(distanceScale(d.match), 2.0) * 0.01
             }
 
           var simulation = d3.forceSimulation(data)
@@ -153,7 +153,7 @@ function LastViz(props) {
               .attr("object-fit", "cover")
               .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
               .attr("xlink:href", function(d){
-                var imageUrl = d.images[1]
+                var imageUrl = d.images[2]
                 if(imageUrl != null){
                   return imageUrl.url;
                 }
