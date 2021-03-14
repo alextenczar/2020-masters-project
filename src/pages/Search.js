@@ -10,7 +10,7 @@ function Search(props) {
     const [artistInfo, setArtistInfo] = useState({});
     const [spotArtistInfo, setSpotArtistInfo] = useState({});
     const name_fixed = name.replace(/\+/g, ' ');
-    const last_url = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=';
+    const last_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=';
     const spot_url = 'https://api.spotify.com/v1/search?q=';
     const spot_results = props.location.state;
     const spot_token = JSON.parse(localStorage.getItem('params'));
