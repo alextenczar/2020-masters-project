@@ -45,10 +45,10 @@ class App extends Component{
     let home;
     let search;
 
-    if(typeof JSON.parse(localStorage.getItem('params')) !== undefined){
+    if(JSON.parse(localStorage.getItem('params')) !== null){
       home = <Route path='/' exact component={Home} />;
       search = <Route path='/search/:name' exact component={Search} />;
-      console.log("all set");
+      console.log(JSON.parse(localStorage.getItem('params')));
     }
     return (
       <div className="wrapper">

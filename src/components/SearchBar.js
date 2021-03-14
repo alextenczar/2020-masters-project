@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom';
 
 const last_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.search&artist=';
 const spot_url = 'https://api.spotify.com/v1/search?q=';
-const spot_token = JSON.parse(localStorage.getItem('params'));
 const {REACT_APP_LAST_API_KEY, REACT_APP_SPOTIFY_CLIENT, REACT_APP_SPOTIFY_SECRET} = process.env;
 
 
@@ -45,7 +44,7 @@ class SearchBar extends Component {
                 headers: {
                     "Accept": "application/json",
                     "Content-Type": "application/json",
-                    Authorization: spot_token.token_type + " " + spot_token.access_token,
+                    Authorization: this.props.type + " " + this.props.token,
                 }
             })
             .then(({ data }) => {

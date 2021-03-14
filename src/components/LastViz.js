@@ -190,7 +190,6 @@ function LastViz(props) {
                 .attr("cy", function(d) { return d.y })
               }
               process = 1 - process;
-              console.log(process);
             }
             drawChart()
             window.addEventListener('resize', drawChart );
