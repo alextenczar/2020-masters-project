@@ -42,75 +42,92 @@ function LastViz(props) {
             var distanceScale = d3.scaleSqrt().domain([lowest, 1]).range([30, 70])
             var defs = svg.append("defs");
 
-            var Tooltip = d3.select("#div_template")
-              .append("div")
+            // charge is dependent on size of the bubble, so bigger towards the middle
+            function charge(d) {
+              return Math.pow(distanceScale(d.match), 2.0) * 0.03
+            }
+
+          var simulation = d3.forceSimulation(data)
+            .force('charge', d3.forceManyBody().strength(charge))
+            .force("x", d3.forceX(width / 2).strength(0.05).x(center.x))
+            .force("y", d3.forceY(height / 2).strength(0.05).y(center.y))
+            .force("collide", d3.forceCollide(function(d){
+              return distanceScale(d.match);}))
+            .stop();
+
+          for (var i = 0; i < 300; ++i) {simulation.tick();}
+
+          var Tooltip = d3.select("#div_template")
+            .append("div")
+            .style("opacity", 0)
+            .attr("class", "tooltip")
+            .style("background-color", "rgba(0, 0, 0, 0.75)")
+            .style("border-radius", "5px")
+            .style("padding", "10px")
+            .style("position", "absolute")
+            .style("color", "white")
+
+          var handleDrag = function(d) {
+            d3.select(this)
+              .style("cursor", "grabbing")
+          }
+
+          var handleMouseUp = function(d) {
+            d3.select(this)
+              .style("cursor", "grab")
+          }
+
+
+          var mouseover = function(d) {
+            Tooltip
+              .style("opacity", 1)
+            d3.select(this)
+              .style("stroke", "white")
+              .style("opacity", 1)
+              .style("cursor", "pointer")
+          }
+          var mousemove = function(event,d) {
+            Tooltip
+              .html(d.name + "<br>Similarity: " + (d.match * 100).toFixed(2) + "%")
+              .style("left", (event.pageX+20) + "px")
+              .style("top", (event.pageY) + "px")
+          }
+          var mouseleave = function(d) {
+            Tooltip
               .style("opacity", 0)
-              .attr("class", "tooltip")
-              .style("background-color", "rgba(0, 0, 0, 0.75)")
-              .style("border-radius", "5px")
-              .style("padding", "10px")
-              .style("position", "absolute")
-              .style("color", "white")
+            d3.select(this)
+              .style("stroke", "none")
+              .style("opacity", 1)
+          }
 
-            var handleDrag = function(d) {
-              d3.select(this)
-                .style("cursor", "grabbing")
-            }
-
-            var handleMouseUp = function(d) {
-              d3.select(this)
-                .style("cursor", "grab")
-            }
+          var g = svg.append("g")
+            .attr("class", "everything")
 
 
-            var mouseover = function(d) {
+          var circles = g.selectAll(".artist")
+            .data(data)
+            .enter().append("circle")
+            .attr("class", "artist")
+            .attr("r", function(d){
+              return distanceScale(d.match);
+            })
+            .attr("fill", function(d, i) {
+              return "url(#" + d.name.toLowerCase().replace(/[ "']/g, "+") + ")";
+            })
+            .on("mouseover", mouseover)
+            .on("mousemove", mousemove)
+            .on("mouseleave", mouseleave)
+            .on("mousedown", function(d) {
               Tooltip
-                .style("opacity", 1)
-              d3.select(this)
-                .style("stroke", "white")
-                .style("opacity", 1)
-                .style("cursor", "pointer")
-            }
-            var mousemove = function(event,d) {
-              Tooltip
-                .html(d.name + "<br>Similarity: " + (d.match * 100).toFixed(2) + "%")
-                .style("left", (event.pageX+20) + "px")
-                .style("top", (event.pageY) + "px")
-            }
-            var mouseleave = function(d) {
-              Tooltip
-                .style("opacity", 0)
-              d3.select(this)
-                .style("stroke", "none")
-                .style("opacity", 1)
-            }
-
-            var g = svg.append("g")
-              .attr("class", "everything")
-  
-
-            var circles = g.selectAll(".artist")
-              .data(data)
-              .enter().append("circle")
-              .attr("class", "artist")
-              .attr("r", function(d){
-                return distanceScale(d.match);
-              })
-              .attr("fill", function(d, i) {
-                return "url(#" + d.name.toLowerCase().replace(/[ "']/g, "+") + ")";
-              })
-              .on("mouseover", mouseover)
-              .on("mousemove", mousemove)
-              .on("mouseleave", mouseleave)
-              .on("mousedown", function(d) {
-                Tooltip
-                  .style('opacity', 0)
-              })
-              .on("click", function(d){
-                const artist = d.target.__data__;
-                const artist_link = "/search/" + artist.name.replace(/\s/g, '+');
-                redirect(artist_link);
-              })
+                .style('opacity', 0)
+            })
+            .on("click", function(d){
+              const artist = d.target.__data__;
+              const artist_link = "/search/" + artist.name.replace(/\s/g, '+');
+              redirect(artist_link);
+            })
+            .attr("cx", function(d) { return d.x })
+            .attr("cy", function(d) { return d.y })
               
 
             defs.selectAll(".artist-pattern")
@@ -135,24 +152,6 @@ function LastViz(props) {
                   return imageUrl.url;
                 }
               })
-              
-              // charge is dependent on size of the bubble, so bigger towards the middle
-              function charge(d) {
-                return Math.pow(distanceScale(d.match), 2.0) * 0.03
-              }
-
-            var simulation = d3.forceSimulation()
-              .force('charge', d3.forceManyBody().strength(charge))
-              .force("x", d3.forceX(width / 2).strength(0.05).x(center.x))
-              .force("y", d3.forceY(height / 2).strength(0.05).y(center.y))
-              .force("collide", d3.forceCollide(function(d){
-                return distanceScale(d.match);}))
-
-            if(data !== null)
-            {
-              simulation.nodes(data)
-              .on('tick', ticked)
-            }
             
             function drawChart() {
               var currentWidth = parseInt(d3.select('#div_template').style('width'), 10)
@@ -169,16 +168,12 @@ function LastViz(props) {
               g.attr("transform", event.transform)
             }
 
+            
+
             var process = 1;
             function ticked() {
-              if(process) {
-                circles
-                .attr("cx", function(d) {
-                  return d.x
-                })
-                .attr("cy", function(d) {
-                  return d.y
-                })
+              if(process === 1) {
+
               }
               process = 1 - process;
             }
