@@ -146,9 +146,7 @@ function LastViz(props) {
               .force("x", d3.forceX(width / 2).strength(0.05).x(center.x))
               .force("y", d3.forceY(height / 2).strength(0.05).y(center.y))
               .force("collide", d3.forceCollide(function(d){
-                return distanceScale(d.match);
-              }))
-            
+                return distanceScale(d.match);}))
 
             if(data !== null)
             {
@@ -171,15 +169,18 @@ function LastViz(props) {
               g.attr("transform", event.transform)
             }
 
-
+            var process = 1;
             function ticked() {
-              circles
+              if(process) {
+                circles
                 .attr("cx", function(d) {
                   return d.x
                 })
                 .attr("cy", function(d) {
                   return d.y
                 })
+              }
+              process = 1 - process;
             }
             drawChart()
             window.addEventListener('resize', drawChart );
