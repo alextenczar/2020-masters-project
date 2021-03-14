@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import * as config from '../config/config.js';
 import axios from 'axios';
 import { Link, Redirect, useHistory , useLocation} from 'react-router-dom';
 import LastViz from './LastViz.js';
@@ -11,8 +10,8 @@ const last_similar_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getsi
 const last_search_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=';
 const spot_search_url = 'https://api.spotify.com/v1/search?q=';
 const spot_similar_url = 'https://api.spotify.com/v1/artists/';
-const last_key = config.keys.last_api_key;
 const spot_token = JSON.parse(localStorage.getItem('params'));
+const {REACT_APP_LAST_API_KEY} = process.env;
 
 class SimilarArtists extends Component {
     constructor() {
@@ -31,7 +30,7 @@ class SimilarArtists extends Component {
     }
 
     async getLast(){
-        const lastPromise = await axios.get(`${last_similar_url}${this.state.artist}&api_key=${last_key}&format=json`)
+        const lastPromise = await axios.get(`${last_similar_url}${this.state.artist}&api_key=${REACT_APP_LAST_API_KEY}&format=json`)
         console.log(lastPromise);
         return lastPromise;
     }
@@ -39,7 +38,7 @@ class SimilarArtists extends Component {
     getLastSearch = () => {
         const artistName = this.state.artist;
         console.log(this.state.artist);
-        axios.get(`${last_search_url}${artistName}&api_key=${last_key}&format=json`)
+        axios.get(`${last_search_url}${artistName}&api_key=${REACT_APP_LAST_API_KEY}&format=json`)
         .then(({ data }) => {
             if(typeof data.artist !== "undefined") {
                 this.setState({lastArtistObject: data.artist});

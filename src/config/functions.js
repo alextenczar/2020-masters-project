@@ -1,7 +1,5 @@
 import axios from 'axios';
-import * as config from './config.js';
-const spotify_client = config.keys.spotify_client;
-const spotify_secret = config.keys.spotify_secret;
+const {REACT_APP_SPOTIFY_CLIENT, REACT_APP_SPOTIFY_SECRET} = process.env
 
 export const getSpotifyToken = () => {
   const test = axios({
@@ -9,7 +7,7 @@ export const getSpotifyToken = () => {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: "Basic " + btoa(spotify_client + ":" + spotify_secret),
+      Authorization: "Basic " + btoa(REACT_APP_SPOTIFY_CLIENT + ":" + REACT_APP_SPOTIFY_SECRET),
     },
     data: "grant_type=client_credentials",
   })

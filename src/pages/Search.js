@@ -1,18 +1,17 @@
 import {Link, useParams} from "react-router-dom";
 import axios from 'axios';
-import * as config from '../config/config.js';
 import React, { useState, useEffect } from 'react';
 import SimilarArtists from '../components/SimilarArtists.js';
 import '../styles/pages/search.scss';
 
 function Search(props) {
+    const {REACT_APP_LAST_API_KEY, REACT_APP_SPOTIFY_CLIENT, REACT_APP_SPOTIFY_SECRET} = process.env
     const { name } = useParams();
     const [artistInfo, setArtistInfo] = useState({});
     const [spotArtistInfo, setSpotArtistInfo] = useState({});
     const name_fixed = name.replace(/\+/g, ' ');
     const last_url = 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=';
     const spot_url = 'https://api.spotify.com/v1/search?q=';
-    const last_key = config.keys.last_api_key;
     const spot_results = props.location.state;
     const spot_token = JSON.parse(localStorage.getItem('params'));
     
@@ -20,7 +19,7 @@ function Search(props) {
         if(spot_token === null) {
             setTimeout(() => { }, 100);
         }
-        axios.get(`${last_url}${name}&api_key=${last_key}&format=json`)
+        axios.get(`${last_url}${name}&api_key=${REACT_APP_LAST_API_KEY}&format=json`)
         .then(({ data }) => {
             setArtistInfo(data.artist);
         })

@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import * as config from '../config/config.js';
 import axios from 'axios';
 import '../styles/components/searchbar.scss';
 import { Link } from 'react-router-dom';
@@ -7,8 +6,8 @@ import { Link } from 'react-router-dom';
 
 const last_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.search&artist=';
 const spot_url = 'https://api.spotify.com/v1/search?q=';
-const last_key = config.keys.last_api_key;
 const spot_token = JSON.parse(localStorage.getItem('params'));
+const {REACT_APP_LAST_API_KEY, REACT_APP_SPOTIFY_CLIENT, REACT_APP_SPOTIFY_SECRET} = process.env;
 
 
 class SearchBar extends Component {
@@ -23,7 +22,7 @@ class SearchBar extends Component {
 
 
     getLast = () => {
-        axios.get(`${last_url}${this.state.search}&api_key=${last_key}&format=json`)
+        axios.get(`${last_url}${this.state.search}&api_key=${REACT_APP_LAST_API_KEY}&format=json`)
         .then(({ data }) => {
             if(typeof data.results !== "undefined" && this.state.search !== "") {
                 this.setState({
