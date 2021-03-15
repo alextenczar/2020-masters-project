@@ -131,7 +131,10 @@ class SimilarArtists extends Component {
                     }))
                 }
                 else if(this.state.lastArtists.length > 0) { //if last.fm returned any similar artists
-                    for(var i = 0; i < 55; i++) {
+                    var z = 0;
+                    var length = this.state.lastArtists.length;
+                    if(length > 75) { length = 75}
+                    for(var i = 0; i < this.state.lastArtists.length; i++) {
                         const similarQuery = this.state.lastArtists[i];
                         promises.push(axios.get(`${spot_search_url}${similarQuery.name}&type=artist&limit=1`, {
                             headers: {
@@ -145,6 +148,7 @@ class SimilarArtists extends Component {
                             if(typeof spotifySearchResult !== "undefined" && typeof data.artists !== "undefined" && this.state.artist !== undefined && similarQuery.name.toUpperCase() === spotifySearchResult.name.toUpperCase()) {
                                 tempLastArtistArray.push(similarQuery);
                                 tempSpotArtistArray.push(spotifySearchResult);
+                                z++;
                             }
 /*                             else
                             {
@@ -157,12 +161,14 @@ class SimilarArtists extends Component {
                         }))
                     }
                     Promise.all(promises).then(() => {  //set the states once all the responses are complete
-                        console.log(tempSpotArtistArray);
-                        console.log(tempLastArtistArray);
-                        console.log(promises);
-                        console.log(this.state.lastArtists);
-                        this.setState({spotFinalArtists: tempSpotArtistArray})
-                        this.setState({lastFinalArtists: tempLastArtistArray})
+/*                         console.log(tempSpotArtistArray);
+                        console.log(tempLastArtistArray); */
+                        var arrayLength = tempLastArtistArray.length;
+                        if(tempLastArtistArray.length > 51) {
+                            arrayLength = 51;
+                        }
+                        this.setState({spotFinalArtists: tempSpotArtistArray.slice(0,arrayLength)})
+                        this.setState({lastFinalArtists: tempLastArtistArray.slice(0,arrayLength)})
                     });
                 }
             })
@@ -197,8 +203,6 @@ class SimilarArtists extends Component {
         }else{
             this.setState({lightboxVisibility: false});
         }
-
-        console.log(this.state.spotArtistObject);
     }
 
     previewAudio(audio){
@@ -295,7 +299,6 @@ class SimilarArtists extends Component {
                         }
                     }                
             }
-            console.log(lowest);
             console.log(this.state.lastFinalArtists)
             console.log(this.state.spotFinalArtists)
             viz = <LastViz lastResults={this.state.lastFinalArtists} artist = {this.state.spotArtistObject} lowest={lowest} spotResults={this.state.spotFinalArtists}></LastViz>

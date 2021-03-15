@@ -112,9 +112,7 @@ function LastViz(props) {
             .data(data)
             .enter().append("circle")
             .attr("class", "artist")
-            .attr("r", function(d){
-              return 0;
-            })
+            .attr("r", 0)
             .attr("fill", function(d, i) {
               return "url(#" + d.name.toLowerCase().replace(/[ "']/g, "+") + ")";
             })
