@@ -132,7 +132,8 @@ function LastViz(props) {
             //.attr("cy", function(d) { return d.y })
           
           circles.transition()
-            .duration(3000)
+            .delay(1000)
+            .duration(2000)
             .attr('r', function(d) {return distanceScale(d.match); });
 
             if(data !== null)
