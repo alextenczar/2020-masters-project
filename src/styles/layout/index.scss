@@ -1,8 +1,19 @@
 @import '../colors';
+@font-face {
+    font-family: 'Montserrat-Regular';
+    font-style: normal;
+    src: local('Montserrat Regular'), url('../../static/fonts/montserrat/Montserrat-Regular.ttf');
+}
+@font-face {
+    font-family: 'Montserrat-Bold';
+    font-style: normal;
+    src: local('Montserrat Bold'), url('../../static/fonts/montserrat/Montserrat-Bold.ttf');
+}
 html {
     background-color: $background-dark;
 }
 body {
+    font-family: "Montserrat-Regular";
     margin: 0;
     &.light{
         color: $text-light;
@@ -17,9 +28,12 @@ body {
         }
         a, a:visited {
             color: $text-light;
+            transition: color 0.25s ease-in;
         }
         a:hover {
             color: $accent-light;
+            transition: color 0.25s ease-in;
+            text-decoration: none;
         }
         
     }

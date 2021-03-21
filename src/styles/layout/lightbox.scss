@@ -1,8 +1,11 @@
+@import '../colors';
 .lightbox {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     margin:auto;
     position: absolute;
     z-index: 100;
-    width: 99vw;
+    width: 100vw;
     height: 100vh;
     overflow: hidden;
     background-color: rgba(38,38,39,.8);
@@ -16,6 +19,60 @@
             font-weight: bolder;
         }
     }
+    .track-wrapper {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        .track-container {
+            justify-content: left;
+        }
+    }
+    .track {
+        #track-name {
+            align-self: center;
+        }
+        justify-content: left;
+        align-content: center;
+        flex-direction: row;
+        display: flex;
+        height: 1em;
+        margin: 1em;
+        .track-icon {
+            color: white;
+            &:hover {
+                color: $accent-dark;
+                cursor: pointer;
+            }
+        }
+        h3 {
+            height: 1em;
+        }
+        button {
+            font-size: 1.5em;
+            padding-right: 1em;
+            align-self: center;
+            border: white;
+            stroke: white;
+            border-radius: 50%;
+            background: none;
+        }
+        .pause-icon {
+            align-self: center;
+            display: none;
+        }
+        .play-icon {
+            align-self: center;
+            display: block;
+        }
+        &.audio-playing {
+            .play-icon {
+                display: none;
+            }
+            .pause-icon {
+                display: block;
+            }
+        }
+    }
     .lightbox-title {
         margin: 0;
     }
@@ -27,8 +84,8 @@
         width:50%;
         text-align: center;
         .lightbox-image {
-            width: 400px;
-            height: 400px;
+            width: 200px;
+            height: 200px;
             background-position: center; 
             background-repeat: no-repeat; 
             background-size: cover;
@@ -43,16 +100,6 @@
             }
             list-style-type:none;
             padding-left: 0;
-        }
-    }
-    .track {
-        display: flex;
-        justify-content: center;
-        h3 {
-            height: 1em;
-        }
-        button {
-            height: 1em;
         }
     }
 }

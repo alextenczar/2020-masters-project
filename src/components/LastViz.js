@@ -70,6 +70,9 @@ function LastViz(props) {
             .style("padding", "10px")
             .style("position", "absolute")
             .style("color", "white")
+            .style("backdrop-filter", "blur(10px)")
+            .style("-webkit-backdrop-filter", "blur(10px)")
+
 
           var handleDrag = function(d) {
             d3.select(this)
@@ -132,7 +135,7 @@ function LastViz(props) {
             //.attr("cy", function(d) { return d.y })
           
           circles.transition()
-            .delay(1000)
+            .delay(1250)
             .duration(2000)
             .attr('r', function(d) {return distanceScale(d.match); });
 

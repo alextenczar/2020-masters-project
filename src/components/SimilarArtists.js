@@ -5,6 +5,11 @@ import LastViz from './LastViz.js';
 import SpotViz from './SpotViz';
 import '../styles/layout/lightbox.scss';
 import '../styles/pages/similarArtist.scss';
+import { thresholdFreedmanDiaconis } from 'd3-array';
+import ReactAudioPlayer from 'react-audio-player';
+
+import { ReactComponent as Play } from "../static/icons/play.svg";
+import { ReactComponent as Pause } from "../static/icons/pause.svg";
 
 const last_similar_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=';
 const last_search_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=';
@@ -17,6 +22,7 @@ class SimilarArtists extends Component {
     constructor() {
         super();
         this.state = {
+            route_changed: 0,
             artist: undefined,
             spotArtistObject: {},
             lastArtistObject: {},
@@ -48,6 +54,8 @@ class SimilarArtists extends Component {
 
     getSpotSearch(){ //used for querying search artist and creating artist object
         const artistName = this.state.artist;
+        this.setState({route_changed: 0});
+        console.log("testing");
         if(spot_token === null) {
             setTimeout(() => { }, 100);
         }
@@ -64,6 +72,7 @@ class SimilarArtists extends Component {
                 for(var k = 0; k < data.artists.items.length; k++) {
                     if(data.artists.items[k].name.toUpperCase().localeCompare(name_fixed.toUpperCase()) == 0) {
                         this.setState({spotArtistObject: data.artists.items[k]});
+                        this.setState({route_changed: 1});
                         break;
                     }
                 }
@@ -205,59 +214,82 @@ class SimilarArtists extends Component {
         }
     }
 
+    pauseAllAudio(){
+        var allAudio = document.querySelectorAll('audio');
+        allAudio.forEach(function(audio){
+            audio.pause();
+        });
+    }
+
     previewAudio(audio){
         var track = document.getElementById(audio); 
+        var trackContainer = document.getElementById(audio + "-container")
         var isPlaying = false;
-        if(track !== null){
+        track.addEventListener("pause", function(){
+            trackContainer.classList.remove('audio-playing');
+        });
+        track.addEventListener("play", function() {
+            trackContainer.classList.add('audio-playing');
+        });
+        track.addEventListener("ended", function(){
+            track.currentTime = 0;
+            trackContainer.classList.remove('audio-playing');
+        });
+        if(track !== null && track.readyState !== 0){
             track.volume= .1;
-            if(track.paused == true){
-                track.play();
-            }
-            else
-            {
-                track.pause();
-            }
+            if(track.paused == true){ this.pauseAllAudio(); track.play(); }
+            else { track.pause(); }
         }
 
     }
+
+    checkLink = async url => (await fetch(url)).status;
     
     render() {
         const images = [];
         const genres = [];
-        var tracks = [];
+        let tracks = [];
         let lightbox;
         const sao = this.state.spotArtistObject;
         const lao = this.state.lastArtistObject;
         const toptracks = this.state.spotTopTracks;
         let viz;
         let sourceArtist;
+        let sourceArtistImage;
+
+        if(this.state.route_changed == 1) {sourceArtistImage = <div id="source-artist-image" style={{backgroundImage: `url(${sao.images[0].url})`}}></div>
+        }else{sourceArtist = <></>}
+        
         if(typeof sao !== "undefined" && typeof sao.images !== "undefined" && typeof lao !== "undefined" && typeof lao.bio !== "undefined") {
             for(var i = 0; i < sao.genres.length; i++) {
                 genres.push(<li>{sao.genres[i]}</li>)
             }
+
             if(typeof toptracks !== "undefined") {
                 console.log(toptracks);
                 var track_count = 0;
                 for(var i = 0; i < toptracks.length; i++) {
                     if(track_count === 3){break;}
                     if(toptracks[i].preview_url !== null){
-                        track_count++;
                         const track = toptracks[i];
-                        console.log(tracks)
+                        track_count++;
                         tracks.push(
-                            <div className="track">
-                                <button className="preview-button" onClick={() => {this.previewAudio(track.name)}}>{track.name}</button>
-                                <h3>{track.name}</h3>
-                                <audio id={track.name} controls>
-                                    <source src={track.preview_url} id={track.name} type="audio/mpeg"></source>
-                                </audio>
+                            <div className="track" id={track.name + "-container"}>
+                                <button className="preview-button" onClick={() => {this.previewAudio(track.name)}}>
+                                    <div className="play-icon track-icon">▶</div>
+                                    <div className="pause-icon track-icon">⏸</div>
+                                </button>
+                                <h4 id="track-name">{track.name}</h4>
+                                <ReactAudioPlayer
+                                id={track.name}
+                                src={track.preview_url}
+                                />
                             </div>
                         )
                     }
                 }
             }
-            
-
+  
             let last_link = <a id="last_link" href={lao.url}>Last.fm</a>
             let spot_link = <a href={sao.external_urls.spotify}>Spotify</a>
             sourceArtist = 
@@ -270,10 +302,14 @@ class SimilarArtists extends Component {
                             {spot_link}
                         </div>
                         <div className="lightbox-container">
-                            <div className="lightbox-image" style={{backgroundImage: `url(${sao.images[1].url})`}}></div>
+                            <div className="lightbox-image" style={{backgroundImage: `url(${sao.images[0].url})`}}></div>
                                 <div className="artist_info">
-                                <ul>    
-                                    {tracks}                       
+                                <div className="track-wrapper">
+                                    <div className="track-container">
+                                        {tracks}
+                                    </div>  
+                                </div>
+                                <ul>                         
                                     <h2>Genre(s)</h2>
                                     {genres}
                                 </ul>
@@ -315,6 +351,7 @@ class SimilarArtists extends Component {
 
         return (
             <div>
+                {sourceArtistImage}
                 {lightbox}
                 {sourceArtist}
                 {viz}
