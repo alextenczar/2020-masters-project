@@ -40,8 +40,6 @@ function Search(props) {
     if (Object.keys(artistInfo).length !== 0 && Object.keys(spotArtistInfo).length !==0) {
         return (
             <>
-                {/*<h1>{name_fixed}</h1><br></br>*/}
-                {/* <img src={spotArtistInfo.images[1].url}></img> */}
                 <Link to="/" id="back-link" key="back">Back</Link>
                 <SimilarArtists artist={name} type={props.type} token={props.token}></SimilarArtists>
             </>

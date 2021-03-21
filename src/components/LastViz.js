@@ -48,11 +48,10 @@ function LastViz(props) {
             }
 
           var simulation = d3.forceSimulation(data)
-            .velocityDecay(0.25)
-            .force("x", d3.forceX(width / 2).strength(.3).x(center.x))
-            .force("y", d3.forceY(height / 2).strength(.3).y(center.y))
-            .force('charge', d3.forceManyBody().strength(charge))
-            .force("collide", d3.forceCollide(function(d){
+          .force("x", d3.forceX(width / 2).strength(.3).x(center.x))
+          .force("y", d3.forceY(height / 2).strength(.3).y(center.y))
+          .force('charge', d3.forceManyBody().strength(charge))
+          .force("collide", d3.forceCollide(function(d){
               return distanceScale(d.match * 1.1);
             }))
             .on('tick', ticked)
@@ -67,7 +66,7 @@ function LastViz(props) {
             .attr("class", "tooltip")
             .style("background-color", "rgba(0, 0, 0, 0.75)")
             .style("border-radius", "5px")
-            .style("padding", "10px")
+            .style("padding", "10px") 
             .style("position", "absolute")
             .style("color", "white")
             .style("backdrop-filter", "blur(10px)")

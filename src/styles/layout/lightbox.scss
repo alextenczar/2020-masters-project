@@ -25,6 +25,9 @@
         flex-direction: column;
         .track-container {
             justify-content: left;
+            @media screen and (max-width: 400px) {
+                max-width: 300px;   
+            }
         }
     }
     .artist-info {
@@ -33,13 +36,15 @@
     .track {
         #track-name {
             align-self: center;
+            overflow-x: hidden;
+            text-overflow: ellipsis;
         }
         justify-content: left;
         align-content: center;
         flex-direction: row;
         display: flex;
-        height: 1em;
-        margin: 1em;
+        height: 1.25em;
+        margin: 1.25em;
         .track-icon {
             color: white;
             &:hover {
@@ -48,7 +53,7 @@
             }
         }
         h4 {
-            height: 1em;
+            height: 1.25em;
             white-space: nowrap;
         }
         button {

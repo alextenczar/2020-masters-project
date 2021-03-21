@@ -18,11 +18,10 @@ function LastViz(props) {
       d3.selectAll("svg > *").remove();
       d3.selectAll(".tooltip").remove();
     }, [location])
-    console.log(spotify_data);
     const data = spotify_data.map(d => ({
       ...d,
-      x: 900,
-      y: 900
+      x: Math.random() * 900,
+      y: Math.random() * 900
     }))
         const ref = useD3(
             (svg) => {
@@ -43,6 +42,8 @@ function LastViz(props) {
               .style("padding", "10px")
               .style("position", "absolute")
               .style("color", "white")
+              .style("backdrop-filter", "blur(10px)")
+              .style("-webkit-backdrop-filter", "blur(10px)")
 
             var handleDrag = function(d) {
               d3.select(this)
@@ -85,9 +86,7 @@ function LastViz(props) {
               .data(data)
               .enter().append("circle")
               .attr("class", "artist")
-              .attr("r", function(d){
-                return distanceScale(d.popularity/100);
-              })
+              .attr("r", 0)
               .attr("fill", function(d, i) {
                 return "url(#" + d.name.toLowerCase().replace(/[ "']/g, "+") + ")";
               })
@@ -130,22 +129,28 @@ function LastViz(props) {
               
               // charge is dependent on size of the bubble, so bigger towards the middle
               function charge(d) {
-                return Math.pow(distanceScale(d.popularity/100), 2.0) * 0.05
+                return -Math.pow(distanceScale(d.popularity/100), 2.0) * 0.05
               }
 
             var simulation = d3.forceSimulation()
+              .force("x", d3.forceX(width / 2).strength(.3).x(center.x))
+              .force("y", d3.forceY(height / 2).strength(.3).y(center.y))
               .force('charge', d3.forceManyBody().strength(charge))
-              .force("x", d3.forceX(width / 2).strength(0.05).x(center.x))
-              .force("y", d3.forceY(height / 2).strength(0.05).y(center.y))
               .force("collide", d3.forceCollide(function(d){
-                return distanceScale(d.popularity/100);
+                return distanceScale(d.popularity/75);
               }))
-            
+              .on('tick', ticked)
+
+            circles.transition()
+            .delay(1250)
+            .duration(2000)
+            .attr('r', function(d) {return distanceScale(d.popularity / 100); });
+
+          
 
             if(data !== null)
             {
               simulation.nodes(data)
-              .on('tick', ticked)
             }
             
             function drawChart() {

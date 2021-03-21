@@ -1,15 +1,10 @@
 import React, {Component} from 'react';
 import axios from 'axios';
-import { Link, Redirect, useHistory , useLocation} from 'react-router-dom';
 import LastViz from './LastViz.js';
 import SpotViz from './SpotViz';
 import '../styles/layout/lightbox.scss';
 import '../styles/pages/similarArtist.scss';
-import { thresholdFreedmanDiaconis } from 'd3-array';
 import ReactAudioPlayer from 'react-audio-player';
-
-import { ReactComponent as Play } from "../static/icons/play.svg";
-import { ReactComponent as Pause } from "../static/icons/pause.svg";
 
 const last_similar_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=';
 const last_search_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=';
@@ -37,13 +32,11 @@ class SimilarArtists extends Component {
 
     async getLast(){
         const lastPromise = await axios.get(`${last_similar_url}${this.state.artist}&api_key=${REACT_APP_LAST_API_KEY}&format=json`)
-        console.log(lastPromise);
         return lastPromise;
     }
 
     getLastSearch = () => {
         const artistName = this.state.artist;
-        console.log(this.state.artist);
         axios.get(`${last_search_url}${artistName}&api_key=${REACT_APP_LAST_API_KEY}&format=json`)
         .then(({ data }) => {
             if(typeof data.artist !== "undefined") {
@@ -55,7 +48,6 @@ class SimilarArtists extends Component {
     getSpotSearch(){ //used for querying search artist and creating artist object
         const artistName = this.state.artist;
         this.setState({route_changed: 0});
-        console.log("testing");
         if(spot_token === null) {
             setTimeout(() => { }, 100);
         }
@@ -71,12 +63,17 @@ class SimilarArtists extends Component {
                 const name_fixed = this.state.artist.replace(/\+/g, ' ');
                 for(var k = 0; k < data.artists.items.length; k++) {
                     if(data.artists.items[k].name.toUpperCase().localeCompare(name_fixed.toUpperCase()) == 0) {
-                        this.setState({spotArtistObject: data.artists.items[k]});
+                        const tempSpotSingleArtist = data.artists.items[k];
+                        if(tempSpotSingleArtist.images.length == 0) {
+                                tempSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
+                                tempSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
+                                tempSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
+                        }
+                        this.setState({spotArtistObject: tempSpotSingleArtist});
                         this.setState({route_changed: 1});
                         break;
                     }
                 }
-                console.log(data);
                 this.getSpotTopTracks();
             }
         })
@@ -98,7 +95,6 @@ class SimilarArtists extends Component {
             .then(({ data }) => {
                 if(typeof data.tracks !== "undefined" && artistId !== "") {
                     this.setState({spotTopTracks: data.tracks});
-                    console.log(this.state.spotTopTracks);
                 }
             })
         }
@@ -135,7 +131,6 @@ class SimilarArtists extends Component {
                     }).then(({data}) => {
                         Promise.all(promises).then(() => { 
                             this.setState({spotArtists: data.artists})
-                            console.log(data.artists);
                         });
                     }))
                 }
@@ -155,6 +150,11 @@ class SimilarArtists extends Component {
                         .then(({ data }) => {
                             const spotifySearchResult = data.artists.items[0]
                             if(typeof spotifySearchResult !== "undefined" && typeof data.artists !== "undefined" && this.state.artist !== undefined && similarQuery.name.toUpperCase() === spotifySearchResult.name.toUpperCase()) {
+                                if(spotifySearchResult.images.length == 0) {
+                                    spotifySearchResult.images.push({url : '/images/default-avatar.png'});
+                                    spotifySearchResult.images.push({url : '/images/default-avatar.png'});
+                                    spotifySearchResult.images.push({url : '/images/default-avatar.png'});
+                                }
                                 tempLastArtistArray.push(similarQuery);
                                 tempSpotArtistArray.push(spotifySearchResult);
                                 z++;
@@ -266,7 +266,6 @@ class SimilarArtists extends Component {
             }
 
             if(typeof toptracks !== "undefined") {
-                console.log(toptracks);
                 var track_count = 0;
                 for(var i = 0; i < toptracks.length; i++) {
                     if(track_count === 3){break;}
@@ -335,8 +334,6 @@ class SimilarArtists extends Component {
                         }
                     }                
             }
-            console.log(this.state.lastFinalArtists)
-            console.log(this.state.spotFinalArtists)
             viz = <LastViz lastResults={this.state.lastFinalArtists} artist = {this.state.spotArtistObject} lowest={lowest} spotResults={this.state.spotFinalArtists}></LastViz>
         }
         if(this.state.spotArtists.length !== 0 && this.state.lastArtists.length === 0){ //if last.fm similar artists don't exist, render spotify's similar artists.
