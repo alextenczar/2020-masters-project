@@ -27,6 +27,9 @@
             justify-content: left;
         }
     }
+    .artist-info {
+        overflow-y: scroll;
+    }
     .track {
         #track-name {
             align-self: center;
@@ -44,8 +47,9 @@
                 cursor: pointer;
             }
         }
-        h3 {
+        h4 {
             height: 1em;
+            white-space: nowrap;
         }
         button {
             font-size: 1.5em;
