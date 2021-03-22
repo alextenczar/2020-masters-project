@@ -105,7 +105,7 @@ class SearchBar extends Component {
         }
      
         return (
-            <form id="home-search" onSubmit={this.handleSubmit}>
+            <form id="home-search" onSubmit={this.handleSubmit} autocomplete="off">
                 <input id="search-box" type="text" value={this.state.search} onChange={this.handleChange} />
                 <div id="suggestion-box" className="suggestions-container">
                     {suggestions}

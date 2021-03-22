@@ -2,7 +2,12 @@
 
 #home-search{
     animation: fadein 2s;
+    width: 400px;
+    @media screen and (max-width: 400px) {
+        width: 300px;
+    }
     input {
+        width: 95%;
         background-color: #171717;
         color: white;
         font-size: 2em;
