@@ -236,7 +236,7 @@ class SimilarArtists extends Component {
             trackContainer.classList.remove('audio-playing');
         });
         if(track !== null && track.readyState !== 0){
-            track.volume= .1;
+            track.volume = .1;
             if(track.paused == true){ this.pauseAllAudio(); track.play(); }
             else { track.pause(); }
         }
