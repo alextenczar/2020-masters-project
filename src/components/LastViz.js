@@ -10,9 +10,7 @@ function LastViz(props) {
     const last_data = props.lastResults;
     const lowest = props.lowest;
     const history = useHistory();
-    const uselocation = useLocation();
-    const artist = props.artist;
-    const test = Date.now();
+    const location = useLocation();
     //const data = props.lastResults;
     const redirect = d => {
       history.push(d);
@@ -25,7 +23,7 @@ function LastViz(props) {
     React.useEffect(() => {
       d3.selectAll("svg > *").remove();
       d3.selectAll(".tooltip").remove();
-    }, [uselocation])
+    }, [location])
 
     const data = last_data.map(d => ({
       ...d,
@@ -46,6 +44,7 @@ function LastViz(props) {
             function charge(d) {
               return -Math.pow(distanceScale(d.match), 2.0) * .3;
             }
+          
 
           var simulation = d3.forceSimulation(data)
           .force("x", d3.forceX(width / 2).strength(.3).x(center.x))
@@ -194,7 +193,6 @@ function LastViz(props) {
             }
             drawChart()
             window.addEventListener('resize', drawChart );
-
         },
         [last_data]
       );

@@ -48,9 +48,6 @@ class SimilarArtists extends Component {
     getSpotSearch(){ //used for querying search artist and creating artist object
         const artistName = this.state.artist;
         this.setState({route_changed: 0});
-        if(spot_token === null) {
-            setTimeout(() => { }, 100);
-        }
         axios.get(`${spot_search_url}${artistName}&type=artist&limit=10`, {
             headers: {
                 "Accept": "application/json",
@@ -69,12 +66,11 @@ class SimilarArtists extends Component {
                                 tempSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
                                 tempSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
                         }
-                        this.setState({spotArtistObject: tempSpotSingleArtist});
+                        this.setState({spotArtistObject: tempSpotSingleArtist}, () => {this.getSpotSimilar(); this.getSpotTopTracks();});
                         this.setState({route_changed: 1});
                         break;
                     }
                 }
-                this.getSpotTopTracks();
             }
         })
     }
@@ -120,7 +116,7 @@ class SimilarArtists extends Component {
         this.getLast().then(({data}) => {
             this.setState({lastArtists: data.similarartists.artist.slice().sort(this.compare)}, () => {
                 var j = 0;
-                if(this.state.lastArtists.length === 0 && typeof this.state.spotArtistObject !== 'undefined') { //if last.fm didn't return any similar artists
+                if(this.state.lastArtists.length === 0 && typeof this.state.spotArtistObject.id !== 'undefined') { //if last.fm didn't return any similar artists
                     const artist_id = this.state.spotArtistObject.id;
                     promises.push(axios.get(`${spot_similar_url}${artist_id}/related-artists`, {
                         headers: {
@@ -189,7 +185,6 @@ class SimilarArtists extends Component {
         {
             this.getSpotSearch();
             this.getLastSearch();
-            this.getSpotSimilar();
         });
     }
 
@@ -197,11 +192,15 @@ class SimilarArtists extends Component {
         if(this.props.artist != this.state.artist){
             this.setState({artist: this.props.artist}, () =>
             {
-                this.setState({spotArtists: []})
-                this.setState({lastArtists: []})
+                this.setState({spotArtistObject: {}});
+                this.setState({lastArtistObject: {}});
+                this.setState({spotTopTracks: []});
+                this.setState({lastFinalArtists: []});
+                this.setState({spotFinalArtists: []});
+                this.setState({spotArtists: []});
+                this.setState({lastArtists: []});
                 this.getSpotSearch();
                 this.getLastSearch();
-                this.getSpotSimilar();
             })
         }
     }
@@ -243,8 +242,6 @@ class SimilarArtists extends Component {
 
     }
 
-    checkLink = async url => (await fetch(url)).status;
-    
     render() {
         const images = [];
         const genres = [];
@@ -262,7 +259,7 @@ class SimilarArtists extends Component {
         
         if(typeof sao !== "undefined" && typeof sao.images !== "undefined" && typeof lao !== "undefined" && typeof lao.bio !== "undefined") {
             for(var i = 0; i < sao.genres.length; i++) {
-                genres.push(<li>{sao.genres[i]}</li>)
+                genres.push(<li key={i} >{sao.genres[i]}</li>)
             }
 
             if(typeof toptracks !== "undefined") {
@@ -273,7 +270,7 @@ class SimilarArtists extends Component {
                         const track = toptracks[i];
                         track_count++;
                         tracks.push(
-                            <div className="track" id={track.name + "-container"}>
+                            <div className="track" key={track.name} id={track.name + "-container"}>
                                 <button className="preview-button" onClick={() => {this.previewAudio(track.name)}}>
                                     <div className="play-icon track-icon">▶</div>
                                     <div className="pause-icon track-icon">⏸</div>

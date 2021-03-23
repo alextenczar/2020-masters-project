@@ -5,7 +5,7 @@ import { Link, Redirect, useHistory , useLocation} from 'react-router-dom';
 import { drag, scaleSqrt, schemeGnBu } from 'd3';
 import '../styles/pages/viz.scss';
 
-function LastViz(props) {
+function SpotViz(props) {
     const spotify_data = props.spotResults;
     const history = useHistory();
     const location = useLocation();
@@ -14,10 +14,17 @@ function LastViz(props) {
       history.push(d);
     }
 
+    window.onpopstate = function() {
+      window.location.reload(true);
+    };
+
     React.useEffect(() => {
       d3.selectAll("svg > *").remove();
       d3.selectAll(".tooltip").remove();
     }, [location])
+
+    d3.selectAll("svg > *").remove();
+    d3.selectAll(".tooltip").remove();
     const data = spotify_data.map(d => ({
       ...d,
       x: Math.random() * 900,
@@ -169,14 +176,14 @@ function LastViz(props) {
             }
 
 
+            var process = 1;
             function ticked() {
-              circles
-                .attr("cx", function(d) {
-                  return d.x
-                })
-                .attr("cy", function(d) {
-                  return d.y
-                })
+              if(process === 1) {
+                circles
+                .attr("cx", function(d) { return d.x })
+                .attr("cy", function(d) { return d.y })
+              }
+              process = 1 - process;
             }
             drawChart()
             window.addEventListener('resize', drawChart );
@@ -209,4 +216,4 @@ function LastViz(props) {
           );
 
 }
-export default LastViz
+export default SpotViz

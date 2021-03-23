@@ -13,7 +13,6 @@ function Search(props) {
     const last_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=';
     const spot_url = 'https://api.spotify.com/v1/search?q=';
     const spot_token = JSON.parse(localStorage.getItem('params'));
-    
     useEffect(() => {
         if(spot_token === null) {
             setTimeout(() => { }, 100);
