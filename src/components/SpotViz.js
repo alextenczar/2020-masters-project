@@ -14,17 +14,15 @@ function SpotViz(props) {
       history.push(d);
     }
 
-    window.onpopstate = function() {
+/*     window.onpopstate = function() {
       window.location.reload(true);
-    };
+    }; */
 
     React.useEffect(() => {
-      d3.selectAll("svg > *").remove();
+      d3.selectAll("#viz > *").remove();
       d3.selectAll(".tooltip").remove();
     }, [location])
 
-    d3.selectAll("svg > *").remove();
-    d3.selectAll(".tooltip").remove();
     const data = spotify_data.map(d => ({
       ...d,
       x: Math.random() * 900,
@@ -40,7 +38,7 @@ function SpotViz(props) {
             var distanceScale = d3.scaleSqrt().domain([0, 1]).range([30, 70])
             var defs = svg.append("defs");
 
-            var Tooltip = d3.select("#div_template")
+            var Tooltip = d3.select("#d3")
               .append("div")
               .style("opacity", 0)
               .attr("class", "tooltip")
@@ -67,7 +65,7 @@ function SpotViz(props) {
               Tooltip
                 .style("opacity", 1)
               d3.select(this)
-                .style("stroke", "black")
+                .style("stroke", "white")
                 .style("opacity", 1)
                 .style("cursor", "pointer")
             }
@@ -161,7 +159,7 @@ function SpotViz(props) {
             }
             
             function drawChart() {
-              var currentWidth = parseInt(d3.select('#div_template').style('width'), 10)
+              var currentWidth = parseInt(d3.select('#d3').style('width'), 10)
               svg.attr("width", currentWidth)
             }
 
@@ -187,7 +185,6 @@ function SpotViz(props) {
             }
             drawChart()
             window.addEventListener('resize', drawChart );
-
         },
         [spotify_data]
       );
@@ -195,9 +192,9 @@ function SpotViz(props) {
     
 
         return (
-          <div id="div_template">
+          <div id="d3">
               <svg
-                id="map"
+                id="viz"
                 ref={ref}
                 style={{
                   height: (window.innerHeight),  

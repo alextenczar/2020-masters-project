@@ -7,7 +7,7 @@ import '../styles/pages/search.scss';
 function Search(props) {
     const {REACT_APP_LAST_API_KEY, REACT_APP_SPOTIFY_CLIENT, REACT_APP_SPOTIFY_SECRET} = process.env
     const { name } = useParams();
-    const [artistInfo, setArtistInfo] = useState({});
+    const [lastArtistInfo, setLastArtistInfo] = useState({});
     const [spotArtistInfo, setSpotArtistInfo] = useState({});
     const name_fixed = name.replace(/\+/g, ' ');
     const last_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=';
@@ -19,7 +19,8 @@ function Search(props) {
         }
         axios.get(`${last_url}${name}&api_key=${REACT_APP_LAST_API_KEY}&format=json`)
         .then(({ data }) => {
-            setArtistInfo(data.artist);
+            console.log(data);
+            setLastArtistInfo(data.artist);
         })
         axios.get(`${spot_url}${name}&type=artist&limit=1`, {
             headers: {
@@ -30,13 +31,14 @@ function Search(props) {
         })
         .then(({ data }) => {
             if(typeof data.artists !== "undefined" && name !== "") {
+                console.log(data.artists);
                 setSpotArtistInfo(data.artists.items[0]);
                 
             }
         })
     }, []);
 
-    if (Object.keys(artistInfo).length !== 0 && Object.keys(spotArtistInfo).length !==0) {
+    if (Object.keys(spotArtistInfo).length !==0) {
         return (
             <>
                 <Link to="/" id="back-link" key="back">Back</Link>

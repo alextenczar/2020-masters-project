@@ -12,11 +12,10 @@
     padding: .25em;
     border-radius: 10px;
     animation: fadein 1s ease-in;
-    transition: color 0.25s ease-in;
+    transition: visibility .5s, opacity .5s linear, color 0.25s ease-in;
     &:hover {
         cursor: pointer;
         color: $accent-light;
-        transition: color 0.25s ease-in;
         text-decoration: none;
     }
 }
@@ -48,9 +47,6 @@
 
 body {
     overflow: hidden;
-}
-#last_link:hover {
-        color: #d92323;
 }
 
 

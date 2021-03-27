@@ -5,6 +5,9 @@ import SpotViz from './SpotViz';
 import '../styles/layout/lightbox.scss';
 import '../styles/pages/similarArtist.scss';
 import ReactAudioPlayer from 'react-audio-player';
+import {ReactComponent as PlayButton} from '../static/icons/play.svg';
+import {ReactComponent as PauseButton} from '../static/icons/pause.svg';
+
 
 const last_similar_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=';
 const last_search_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=';
@@ -22,7 +25,6 @@ class SimilarArtists extends Component {
             spotArtistObject: {},
             lastArtistObject: {},
             spotTopTracks: [],
-            lastArtists: [],
             spotArtists: [],
             lastFinalArtists: [],
             spotFinalArtists: [],
@@ -60,13 +62,13 @@ class SimilarArtists extends Component {
                 const name_fixed = this.state.artist.replace(/\+/g, ' ');
                 for(var k = 0; k < data.artists.items.length; k++) {
                     if(data.artists.items[k].name.toUpperCase().localeCompare(name_fixed.toUpperCase()) == 0) {
-                        const tempSpotSingleArtist = data.artists.items[k];
-                        if(tempSpotSingleArtist.images.length == 0) {
-                                tempSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
-                                tempSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
-                                tempSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
+                        const filteredSpotSingleArtist = data.artists.items[k];
+                        if(filteredSpotSingleArtist.images.length == 0) {
+                                filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
+                                filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
+                                filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
                         }
-                        this.setState({spotArtistObject: tempSpotSingleArtist}, () => {this.getSpotSimilar(); this.getSpotTopTracks();});
+                        this.setState({spotArtistObject: filteredSpotSingleArtist}, () => {this.getSpotSimilar(); this.getSpotTopTracks();});
                         this.setState({route_changed: 1});
                         break;
                     }
@@ -110,73 +112,73 @@ class SimilarArtists extends Component {
     }
 
     getSpotSimilar = () => {
-        const tempLastArtistArray = []
-        const tempSpotArtistArray = []
+        let initialLastArtistArray = [];
+        const filteredLastArtistArray = [];
+        const filteredSpotArtistArray = [];
         const promises = []
         this.getLast().then(({data}) => {
-            this.setState({lastArtists: data.similarartists.artist.slice().sort(this.compare)}, () => {
-                var j = 0;
-                if(this.state.lastArtists.length === 0 && typeof this.state.spotArtistObject.id !== 'undefined') { //if last.fm didn't return any similar artists
-                    const artist_id = this.state.spotArtistObject.id;
-                    promises.push(axios.get(`${spot_similar_url}${artist_id}/related-artists`, {
+            if(typeof data.similarartists !== "undefined") { initialLastArtistArray = data.similarartists.artist.slice().sort(this.compare);}
+            var j = 0;
+            if(initialLastArtistArray.length === 0 && typeof this.state.spotArtistObject.id !== 'undefined') { //if last.fm didn't return any similar artists
+                const artist_id = this.state.spotArtistObject.id;
+                promises.push(axios.get(`${spot_similar_url}${artist_id}/related-artists`, {
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        Authorization: this.props.type + " " + this.props.token,
+                    }
+                }).then(({data}) => {
+                    Promise.all(promises).then(() => { 
+                        this.setState({spotArtists: data.artists})
+                    });
+                }))
+            }
+            else if(initialLastArtistArray.length > 0) { //if last.fm returned any similar artists
+                var z = 0;
+                var length = initialLastArtistArray.length;
+                if(length > 75) { length = 75}
+                for(var i = 0; i < initialLastArtistArray.length; i++) {
+                    const similarQuery = initialLastArtistArray[i];
+                    promises.push(axios.get(`${spot_search_url}${similarQuery.name}&type=artist&limit=1`, {
                         headers: {
                             "Accept": "application/json",
                             "Content-Type": "application/json",
                             Authorization: this.props.type + " " + this.props.token,
                         }
-                    }).then(({data}) => {
-                        Promise.all(promises).then(() => { 
-                            this.setState({spotArtists: data.artists})
-                        });
+                    })
+                    .then(({ data }) => {
+                        const spotifySearchResult = data.artists.items[0]
+                        if(typeof spotifySearchResult !== "undefined" && typeof data.artists !== "undefined" && this.state.artist !== undefined && similarQuery.name.toUpperCase() === spotifySearchResult.name.toUpperCase()) {
+                            if(spotifySearchResult.images.length == 0) {
+                                spotifySearchResult.images.push({url : '/images/default-avatar.png'});
+                                spotifySearchResult.images.push({url : '/images/default-avatar.png'});
+                                spotifySearchResult.images.push({url : '/images/default-avatar.png'});
+                            }
+                            filteredLastArtistArray.push(similarQuery);
+                            filteredSpotArtistArray.push(spotifySearchResult);
+                            z++;
+                        }
+/*                             else
+                        {
+                            filteredSpotArtistArray.push('null');
+                            filteredLastArtistArray.push('null');
+                        } */
+                        j++;
+                    }).catch(err => {
+                        return null;
                     }))
                 }
-                else if(this.state.lastArtists.length > 0) { //if last.fm returned any similar artists
-                    var z = 0;
-                    var length = this.state.lastArtists.length;
-                    if(length > 75) { length = 75}
-                    for(var i = 0; i < this.state.lastArtists.length; i++) {
-                        const similarQuery = this.state.lastArtists[i];
-                        promises.push(axios.get(`${spot_search_url}${similarQuery.name}&type=artist&limit=1`, {
-                            headers: {
-                                "Accept": "application/json",
-                                "Content-Type": "application/json",
-                                Authorization: this.props.type + " " + this.props.token,
-                            }
-                        })
-                        .then(({ data }) => {
-                            const spotifySearchResult = data.artists.items[0]
-                            if(typeof spotifySearchResult !== "undefined" && typeof data.artists !== "undefined" && this.state.artist !== undefined && similarQuery.name.toUpperCase() === spotifySearchResult.name.toUpperCase()) {
-                                if(spotifySearchResult.images.length == 0) {
-                                    spotifySearchResult.images.push({url : '/images/default-avatar.png'});
-                                    spotifySearchResult.images.push({url : '/images/default-avatar.png'});
-                                    spotifySearchResult.images.push({url : '/images/default-avatar.png'});
-                                }
-                                tempLastArtistArray.push(similarQuery);
-                                tempSpotArtistArray.push(spotifySearchResult);
-                                z++;
-                            }
-/*                             else
-                            {
-                                tempSpotArtistArray.push('null');
-                                tempLastArtistArray.push('null');
-                            } */
-                            j++;
-                        }).catch(err => {
-                            return null;
-                        }))
+                Promise.all(promises).then(() => {  //set the states once all the responses are complete
+/*                         console.log(filteredSpotArtistArray);
+                    console.log(filteredLastArtistArray); */
+                    var arrayLength = filteredLastArtistArray.length;
+                    if(filteredLastArtistArray.length > 51) {
+                        arrayLength = 51;
                     }
-                    Promise.all(promises).then(() => {  //set the states once all the responses are complete
-/*                         console.log(tempSpotArtistArray);
-                        console.log(tempLastArtistArray); */
-                        var arrayLength = tempLastArtistArray.length;
-                        if(tempLastArtistArray.length > 51) {
-                            arrayLength = 51;
-                        }
-                        this.setState({spotFinalArtists: tempSpotArtistArray.slice(0,arrayLength)})
-                        this.setState({lastFinalArtists: tempLastArtistArray.slice(0,arrayLength)})
-                    });
-                }
-            })
+                    this.setState({spotFinalArtists: filteredSpotArtistArray.slice(0,arrayLength)})
+                    this.setState({lastFinalArtists: filteredLastArtistArray.slice(0,arrayLength)})
+                });
+            }
         })
     }
 
@@ -198,7 +200,6 @@ class SimilarArtists extends Component {
                 this.setState({lastFinalArtists: []});
                 this.setState({spotFinalArtists: []});
                 this.setState({spotArtists: []});
-                this.setState({lastArtists: []});
                 this.getSpotSearch();
                 this.getLastSearch();
             })
@@ -235,8 +236,7 @@ class SimilarArtists extends Component {
             trackContainer.classList.remove('audio-playing');
         });
         if(track !== null && track.readyState !== 0){
-            track.volume = .1;
-            if(track.paused == true){ this.pauseAllAudio(); track.play(); }
+            if(track.paused == true){ this.pauseAllAudio(); track.volume = .75; track.play(); }
             else { track.pause(); }
         }
 
@@ -272,8 +272,8 @@ class SimilarArtists extends Component {
                         tracks.push(
                             <div className="track" key={track.name} id={track.name + "-container"}>
                                 <button className="preview-button" onClick={() => {this.previewAudio(track.name)}}>
-                                    <div className="play-icon track-icon">▶</div>
-                                    <div className="pause-icon track-icon">⏸</div>
+                                    <PlayButton className="play-icon track-icon"/>
+                                    <PauseButton className="pause-icon track-icon"/>
                                 </button>
                                 <h4 id="track-name">{track.name}</h4>
                                 <ReactAudioPlayer
@@ -318,7 +318,7 @@ class SimilarArtists extends Component {
             var lowest = 1;
             const last_results = this.state.lastFinalArtists
             const spot_results = this.state.spotFinalArtists
-            for (var k = 0; k < this.state.lastArtists.length; k++) {
+            for (var k = 0; k < this.state.lastFinalArtists.length; k++) {
                     if(typeof last_results[k] !== 'undefined') {
                         if(last_results[k].match < lowest) {
                             lowest = last_results[k].match
@@ -333,7 +333,7 @@ class SimilarArtists extends Component {
             }
             viz = <LastViz lastResults={this.state.lastFinalArtists} artist = {this.state.spotArtistObject} lowest={lowest} spotResults={this.state.spotFinalArtists}></LastViz>
         }
-        if(this.state.spotArtists.length !== 0 && this.state.lastArtists.length === 0){ //if last.fm similar artists don't exist, render spotify's similar artists.
+        if(this.state.spotArtists.length !== 0 && this.state.lastFinalArtists.length === 0){ //if last.fm similar artists don't exist, render spotify's similar artists.
             for(var l = 0; l < this.state.spotArtists.length; l++) {
                 const spot_results = this.state.spotArtists;
                 const artist_name = spot_results[l].name;

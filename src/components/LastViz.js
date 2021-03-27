@@ -16,12 +16,12 @@ function LastViz(props) {
       history.push(d);
     }
 
-    window.onpopstate = function() {
+/*     window.onpopstate = function() {
       window.location.reload(true);
-    };
+    }; */
 
     React.useEffect(() => {
-      d3.selectAll("svg > *").remove();
+      d3.selectAll("#viz > *").remove();
       d3.selectAll(".tooltip").remove();
     }, [location])
 
@@ -59,7 +59,7 @@ function LastViz(props) {
 
           //for (var i = 0; i < 300; ++i) {simulation.tick();} // for static viz
 
-          var Tooltip = d3.select("#div_template")
+          var Tooltip = d3.select("#d3")
             .append("div")
             .style("opacity", 0)
             .attr("class", "tooltip")
@@ -166,7 +166,7 @@ function LastViz(props) {
               })
             
             function drawChart() {
-              var currentWidth = parseInt(d3.select('#div_template').style('width'), 10)
+              var currentWidth = parseInt(d3.select('#d3').style('width'), 10)
               svg.attr("width", currentWidth)
             }
 
@@ -200,9 +200,9 @@ function LastViz(props) {
     
 
         return (
-          <div id="div_template">
+          <div id="d3">
               <svg
-                id="map"
+                id="viz"
                 ref={ref}
                 style={{
                   height: (window.innerHeight),  

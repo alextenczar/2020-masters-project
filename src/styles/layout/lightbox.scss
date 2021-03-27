@@ -10,14 +10,18 @@
     overflow: hidden;
     background-color: rgba(38,38,39,.8);
     text-align: center;
-    transition: visibility .25s, opacity .25s linear;
+    transition: visibility .5s, opacity .5s linear;
     .external-links {
         padding-bottom: .5em;
         a {
+            transition: color 0.25s ease-in;
             padding-right: .5em;
             text-decoration: none;
             font-weight: bolder;
         }
+    }
+    #last_link:hover {
+        color: #d92323;
     }
     .track-wrapper {
         display: flex;
@@ -46,6 +50,9 @@
         height: 1.25em;
         margin: 1.25em;
         .track-icon {
+            transition: color 0.25s ease-in;
+            width: 1em;
+            height: auto;
             color: white;
             &:hover {
                 color: $accent-dark;
@@ -58,7 +65,7 @@
         }
         button {
             font-size: 1.5em;
-            padding-right: 1em;
+            padding: .25em;
             align-self: center;
             border: white;
             stroke: white;
@@ -66,11 +73,11 @@
             background: none;
         }
         .pause-icon {
-            align-self: center;
+            //align-self: center;
             display: none;
         }
         .play-icon {
-            align-self: center;
+            //align-self: center;
             display: block;
         }
         &.audio-playing {
