@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import axios from 'axios';
 import '../styles/components/searchbar.scss';
 import { Link } from 'react-router-dom';
+import {ReactComponent as Search} from '../static/icons/search.svg';
 
 
 const last_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.search&artist=';
@@ -105,8 +106,8 @@ class SearchBar extends Component {
         }
      
         return (
-            <form id="home-search" onSubmit={this.handleSubmit} autocomplete="off">
-                <input id="search-box" type="text" value={this.state.search} onChange={this.handleChange} />
+            <form id="home-search" onSubmit={this.handleSubmit} autoComplete="off">
+                <input id="search-box" type="text" value={this.state.search} onChange={this.handleChange} placeholder="Search for..."></input>
                 <div id="suggestion-box" className="suggestions-container">
                     {suggestions}
                 </div>

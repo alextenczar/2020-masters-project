@@ -169,6 +169,14 @@ function SpotViz(props) {
 
             zoom_handler(svg);
 
+            zoom_handler.on("start", function() {
+              svg.style("cursor", "grabbing")
+            })
+
+            zoom_handler.on("end", function() {
+              svg.style("cursor", "grab")
+            })
+
             function zoom_actions(event){
               g.attr("transform", event.transform)
             }

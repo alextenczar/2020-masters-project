@@ -7,6 +7,9 @@ import '../styles/pages/similarArtist.scss';
 import ReactAudioPlayer from 'react-audio-player';
 import {ReactComponent as PlayButton} from '../static/icons/play.svg';
 import {ReactComponent as PauseButton} from '../static/icons/pause.svg';
+import {ReactComponent as LastIcon} from '../static/icons/lastfm.svg';
+import {ReactComponent as SpotifyIcon} from '../static/icons/spotify.svg';
+import {ReactComponent as Close} from '../static/icons/close.svg';
 
 
 const last_similar_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=';
@@ -64,9 +67,9 @@ class SimilarArtists extends Component {
                     if(data.artists.items[k].name.toUpperCase().localeCompare(name_fixed.toUpperCase()) == 0) {
                         const filteredSpotSingleArtist = data.artists.items[k];
                         if(filteredSpotSingleArtist.images.length == 0) {
-                                filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
-                                filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
-                                filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
+                            filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
+                            filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
+                            filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
                         }
                         this.setState({spotArtistObject: filteredSpotSingleArtist}, () => {this.getSpotSimilar(); this.getSpotTopTracks();});
                         this.setState({route_changed: 1});
@@ -118,7 +121,6 @@ class SimilarArtists extends Component {
         const promises = []
         this.getLast().then(({data}) => {
             if(typeof data.similarartists !== "undefined") { initialLastArtistArray = data.similarartists.artist.slice().sort(this.compare);}
-            var j = 0;
             if(initialLastArtistArray.length === 0 && typeof this.state.spotArtistObject.id !== 'undefined') { //if last.fm didn't return any similar artists
                 const artist_id = this.state.spotArtistObject.id;
                 promises.push(axios.get(`${spot_similar_url}${artist_id}/related-artists`, {
@@ -158,19 +160,11 @@ class SimilarArtists extends Component {
                             filteredSpotArtistArray.push(spotifySearchResult);
                             z++;
                         }
-/*                             else
-                        {
-                            filteredSpotArtistArray.push('null');
-                            filteredLastArtistArray.push('null');
-                        } */
-                        j++;
                     }).catch(err => {
                         return null;
                     }))
                 }
                 Promise.all(promises).then(() => {  //set the states once all the responses are complete
-/*                         console.log(filteredSpotArtistArray);
-                    console.log(filteredLastArtistArray); */
                     var arrayLength = filteredLastArtistArray.length;
                     if(filteredLastArtistArray.length > 51) {
                         arrayLength = 51;
@@ -207,9 +201,12 @@ class SimilarArtists extends Component {
     }
 
     showLightbox = () => {
+        var wrapper = document.getElementsByClassName("wrapper")
         if(this.state.lightboxVisibility == false){
+            wrapper[0].classList.add("lightbox-visible");
             this.setState({lightboxVisibility: true});
         }else{
+            wrapper[0].classList.remove("lightbox-visible");
             this.setState({lightboxVisibility: false});
         }
     }
@@ -224,7 +221,6 @@ class SimilarArtists extends Component {
     previewAudio(audio){
         var track = document.getElementById(audio); 
         var trackContainer = document.getElementById(audio + "-container")
-        var isPlaying = false;
         track.addEventListener("pause", function(){
             trackContainer.classList.remove('audio-playing');
         });
@@ -243,13 +239,13 @@ class SimilarArtists extends Component {
     }
 
     render() {
-        const images = [];
         const genres = [];
-        let tracks = [];
-        let lightbox;
         const sao = this.state.spotArtistObject;
         const lao = this.state.lastArtistObject;
         const toptracks = this.state.spotTopTracks;
+        let tracks = [];
+        let genreContainer;
+        let lightbox;
         let viz;
         let sourceArtist;
         let sourceArtistImage;
@@ -258,8 +254,19 @@ class SimilarArtists extends Component {
         }else{sourceArtist = <></>}
         
         if(typeof sao !== "undefined" && typeof sao.images !== "undefined" && typeof lao !== "undefined" && typeof lao.bio !== "undefined") {
-            for(var i = 0; i < sao.genres.length; i++) {
+            var genreLength = sao.genres.length;
+            let genreTitle = "Genre(s)"
+            if(genreLength == 1) { genreTitle = "Genre"}
+            if(genreLength > 6) { genreLength = 6}
+            for(var i = 0; i < genreLength; i++) {
                 genres.push(<li key={i} >{sao.genres[i]}</li>)
+            }
+            if(genreLength > 0) {
+                genreContainer =
+                <ul className="genre-list">                         
+                    <h2>{genreTitle}</h2>
+                    {genres}
+                </ul>
             }
 
             if(typeof toptracks !== "undefined") {
@@ -286,13 +293,14 @@ class SimilarArtists extends Component {
                 }
             }
   
-            let last_link = <a id="last_link" href={lao.url}>Last.fm</a>
-            let spot_link = <a href={sao.external_urls.spotify}>Spotify</a>
+            let last_link = <a id="last_link" href={lao.url}><LastIcon/></a>
+            let spot_link = <a id="spot_link" href={sao.external_urls.spotify}><SpotifyIcon/></a>
             sourceArtist = 
                 <div key={sao.name}> 
                     <h1 id="artist-title" onClick={this.showLightbox} style={{ visibility: this.state.lightboxVisibility ? "hidden" : "visible", opacity: this.state.lightboxVisibility ? "0" : "1"}}>{sao.name}</h1>
-                    <div className="lightbox" style={{ visibility: this.state.lightboxVisibility ? "visible" : "hidden", opacity: this.state.lightboxVisibility ? "1" : "0"}}>
-                        <h1 className="lightbox-title" onClick={this.showLightbox}>{sao.name}</h1>
+                    <div id="lightbox" className="lightbox" style={{ visibility: this.state.lightboxVisibility ? "visible" : "hidden", opacity: this.state.lightboxVisibility ? "1" : "0"}}>
+                        <div><Close className="close-icon" onClick={this.showLightbox}/></div>
+                        <h1 className="lightbox-title">{sao.name}</h1>
                         <div className="external-links">
                             {last_link}
                             {spot_link}
@@ -305,10 +313,7 @@ class SimilarArtists extends Component {
                                         {tracks}
                                     </div>  
                                 </div>
-                                <ul>                         
-                                    <h2>Genre(s)</h2>
-                                    {genres}
-                                </ul>
+                                {genreContainer}
                             </div>
                         </div>
                     </div>
@@ -346,7 +351,6 @@ class SimilarArtists extends Component {
         return (
             <div>
                 {sourceArtistImage}
-                {lightbox}
                 {sourceArtist}
                 {viz}
             </div>

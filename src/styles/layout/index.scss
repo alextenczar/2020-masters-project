@@ -15,46 +15,24 @@ html {
 body {
     font-family: "Montserrat-Regular";
     margin: 0;
-    &.light{
-        color: $text-light;
-        background-color: $background-light;
-        ::selection {
-            color: $background-light;
-            background: $accent-light; 
-        }
-        ::-moz-selection {
-            color: $background-light;
-            background: $accent-light;
-        }
-        a, a:visited {
-            color: $text-light;
-            transition: color 0.25s ease-in;
-        }
-        a:hover {
-            color: $accent-light;
-            transition: color 0.25s ease-in;
-            text-decoration: none;
-        }
-        
-    }
-    &{
-        color: $text-dark;
-        background-color: $background-dark;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        ::selection {
-            color: $background-dark;
-            background: $accent-dark;
-          }
-        ::-moz-selection {
+    color: $text-dark;
+    background-color: $background-dark;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    ::selection {
         color: $background-dark;
-        background: $accent-dark; 
+        background: $accent-dark;
         }
-        a, a:visited {
-            color: $text-dark;
-        }
-        a:hover {
-            color: $accent-dark;
-        }
+    ::-moz-selection {
+    color: $background-dark;
+    background: $accent-dark; 
+    }
+    a, a:visited {
+        color: $text-dark;
+        text-decoration: none;
+        transition: color 0.25s ease-in;
+    }
+    a:hover {
+        color: $accent-dark;
     }
 }

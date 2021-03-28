@@ -1,5 +1,21 @@
 #back-link {
+    display: initial;
     position: absolute;
     margin: .5em;
     text-decoration: none;
+    opacity: 1;
+    visibility: unset;
+    transition: visibility .5s, opacity .5s linear;
+    #back-button {
+        margin-top: .9em;
+        padding: .25em;
+        width: 2em;
+    }
+}
+
+.wrapper.lightbox-visible {
+    #back-link {
+        opacity: 0;
+        visibility: hidden;
+    }
 }

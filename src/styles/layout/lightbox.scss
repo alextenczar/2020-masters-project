@@ -11,13 +11,40 @@
     background-color: rgba(38,38,39,.8);
     text-align: center;
     transition: visibility .5s, opacity .5s linear;
+    .genre-list {
+        margin-top: 0;
+        h2 {
+            margin-top: 0;
+        }
+    }
     .external-links {
+        padding-top: .25em;
         padding-bottom: .5em;
         a {
-            transition: color 0.25s ease-in;
-            padding-right: .5em;
+            width: 1.5em;
+            padding-right: .25em;
+            padding-left: .25em;
             text-decoration: none;
             font-weight: bolder;
+        }
+        svg {
+            height: auto;
+            width: 1.5em;
+        }
+    }
+    .close-icon {
+        text-align: unset;
+        left: 0;
+        display: initial;
+        position: absolute;
+        margin: .5em;
+        text-decoration: none;
+        margin-top: 1.4em;
+        padding: .25em;
+        width: 2em;
+        &:hover {
+            cursor: pointer;
+            color: $accent-dark;
         }
     }
     #last_link:hover {
@@ -28,6 +55,7 @@
         align-items: center;
         flex-direction: column;
         .track-container {
+            max-width: 25em;
             justify-content: left;
             @media screen and (max-width: 400px) {
                 max-width: 300px;   
@@ -41,6 +69,7 @@
         #track-name {
             align-self: center;
             overflow-x: hidden;
+            overflow-y: hidden;
             text-overflow: ellipsis;
         }
         justify-content: left;
@@ -73,11 +102,9 @@
             background: none;
         }
         .pause-icon {
-            //align-self: center;
             display: none;
         }
         .play-icon {
-            //align-self: center;
             display: block;
         }
         &.audio-playing {
@@ -90,8 +117,9 @@
         }
     }
     .lightbox-title {
-        margin: 1em 0 0 0;
+        margin: .75em 0 0 0;
     }
+
     .lightbox-container {
         a{
             padding-right: 1em;

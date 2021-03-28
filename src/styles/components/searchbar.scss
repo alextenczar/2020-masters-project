@@ -7,9 +7,17 @@
         width: 300px;
     }
     input {
+        background-image: url(../../static/icons/search.svg);
+        background-repeat: no-repeat;
+        background-position: left;
+        background-position-x: 1%;
+        background-size: 7%;
+        background-color: white;
+        text-indent: 1em;
         width: 95%;
         @media screen and (max-width: 400px) {
             width: 280px;
+            text-indent: .75em;
         }
         background-color: #171717;
         color: white;

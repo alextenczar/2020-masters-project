@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as d3 from 'd3';
 import {useD3} from '../hooks/UseD3.js';
 import { Link, Redirect, useHistory , useLocation} from 'react-router-dom';
-import { drag, scaleSqrt, schemeGnBu } from 'd3';
+import { drag, scaleSqrt, schemeGnBu, zoom } from 'd3';
 import '../styles/pages/viz.scss';
 
 function LastViz(props) {
@@ -107,7 +107,7 @@ function LastViz(props) {
 
           var g = svg.append("g")
             .attr("class", "everything")
-
+            .style("background-color", "white")
 
           var circles = g.selectAll(".artist")
             .data(data)
@@ -122,7 +122,7 @@ function LastViz(props) {
             .on("mouseleave", mouseleave)
             .on("mousedown", function(d) {
               Tooltip
-                .style('opacity', 0)
+                .style('visibility', "hidden")
             })
             .on("click", function(d){
               const artist = d.target.__data__;
@@ -172,15 +172,21 @@ function LastViz(props) {
 
 
             var zoom_handler = d3.zoom()
-               .on("zoom", zoom_actions);
+               .on("zoom", zoom_actions)
 
             zoom_handler(svg);
+            
+            zoom_handler.on("start", function() {
+              svg.style("cursor", "grabbing")
+            })
+
+            zoom_handler.on("end", function() {
+              svg.style("cursor", "grab")
+            })
 
             function zoom_actions(event){
               g.attr("transform", event.transform)
             }
-
-            
 
             var process = 1;
             function ticked() {
@@ -196,8 +202,6 @@ function LastViz(props) {
         },
         [last_data]
       );
-
-    
 
         return (
           <div id="d3">

@@ -3,6 +3,7 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import SimilarArtists from '../components/SimilarArtists.js';
 import '../styles/pages/search.scss';
+import {ReactComponent as Back} from '../static/icons/back.svg';
 
 function Search(props) {
     const {REACT_APP_LAST_API_KEY, REACT_APP_SPOTIFY_CLIENT, REACT_APP_SPOTIFY_SECRET} = process.env
@@ -19,7 +20,6 @@ function Search(props) {
         }
         axios.get(`${last_url}${name}&api_key=${REACT_APP_LAST_API_KEY}&format=json`)
         .then(({ data }) => {
-            console.log(data);
             setLastArtistInfo(data.artist);
         })
         axios.get(`${spot_url}${name}&type=artist&limit=1`, {
@@ -31,9 +31,7 @@ function Search(props) {
         })
         .then(({ data }) => {
             if(typeof data.artists !== "undefined" && name !== "") {
-                console.log(data.artists);
                 setSpotArtistInfo(data.artists.items[0]);
-                
             }
         })
     }, []);
@@ -41,7 +39,7 @@ function Search(props) {
     if (Object.keys(spotArtistInfo).length !==0) {
         return (
             <>
-                <Link to="/" id="back-link" key="back">Back</Link>
+                <Link to="/" id="back-link" key="back"><Back id="back-button"/></Link>
                 <SimilarArtists artist={name} type={props.type} token={props.token}></SimilarArtists>
             </>
         )
