@@ -5,7 +5,7 @@
     text-decoration: none;
     opacity: 1;
     visibility: unset;
-    transition: visibility .5s, opacity .5s linear;
+    transition: visibility .5s, opacity .5s linear, color 0.25s ease-in;
     #back-button {
         margin-top: .9em;
         padding: .25em;

@@ -41,8 +41,7 @@ class SimilarArtists extends Component {
     }
 
     getLastSearch = () => {
-        const artistName = this.state.artist;
-        axios.get(`${last_search_url}${artistName}&api_key=${REACT_APP_LAST_API_KEY}&format=json`)
+        axios.get(`${last_search_url}${this.state.artist}&api_key=${REACT_APP_LAST_API_KEY}&format=json`)
         .then(({ data }) => {
             if(typeof data.artist !== "undefined") {
                 this.setState({lastArtistObject: data.artist});
@@ -51,9 +50,8 @@ class SimilarArtists extends Component {
     }
 
     getSpotSearch(){ //used for querying search artist and creating artist object
-        const artistName = this.state.artist;
         this.setState({route_changed: 0});
-        axios.get(`${spot_search_url}${artistName}&type=artist&limit=10`, {
+        axios.get(`${spot_search_url}${this.state.artist}&type=artist&limit=10`, {
             headers: {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
@@ -61,7 +59,7 @@ class SimilarArtists extends Component {
             }
         })
         .then(({ data }) => {
-            if(typeof data.artists !== "undefined" && artistName !== "") {
+            if(typeof data.artists !== "undefined" && this.state.artist !== "") {
                 const name_fixed = this.state.artist.replace(/\+/g, ' ');
                 for(var k = 0; k < data.artists.items.length; k++) {
                     if(data.artists.items[k].name.toUpperCase().localeCompare(name_fixed.toUpperCase()) == 0) {

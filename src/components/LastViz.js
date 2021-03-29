@@ -11,6 +11,7 @@ function LastViz(props) {
     const lowest = props.lowest;
     const history = useHistory();
     const location = useLocation();
+    const currentUrl = window.location.href;
     //const data = props.lastResults;
     const redirect = d => {
       history.push(d);
@@ -71,18 +72,6 @@ function LastViz(props) {
             .style("backdrop-filter", "blur(10px)")
             .style("-webkit-backdrop-filter", "blur(10px)")
 
-
-          var handleDrag = function(d) {
-            d3.select(this)
-              .style("cursor", "grabbing")
-          }
-
-          var handleMouseUp = function(d) {
-            d3.select(this)
-              .style("cursor", "grab")
-          }
-
-
           var mouseover = function(d) {
             Tooltip
               .style("opacity", 1)
@@ -120,17 +109,11 @@ function LastViz(props) {
             .on("mouseover", mouseover)
             .on("mousemove", mousemove)
             .on("mouseleave", mouseleave)
-            .on("mousedown", function(d) {
-              Tooltip
-                .style('visibility', "hidden")
-            })
             .on("click", function(d){
               const artist = d.target.__data__;
               const artist_link = "/search/" + artist.name.replace(/\s/g, '+');
               redirect(artist_link);
             })
-            //.attr("cx", function(d) { return d.x })
-            //.attr("cy", function(d) { return d.y })
           
           circles.transition()
             .delay(1250)
@@ -167,7 +150,10 @@ function LastViz(props) {
             
             function drawChart() {
               var currentWidth = parseInt(d3.select('#d3').style('width'), 10)
+              var currentHeight = window.innerHeight
               svg.attr("width", currentWidth)
+              svg.attr("height", currentHeight)
+              svg.style("height", currentHeight)
             }
 
 
@@ -178,10 +164,16 @@ function LastViz(props) {
             
             zoom_handler.on("start", function() {
               svg.style("cursor", "grabbing")
+              Tooltip
+                .style('visibility', "hidden")
+                .style('opacity', 0)
             })
 
             zoom_handler.on("end", function() {
               svg.style("cursor", "grab")
+              Tooltip
+                .style('visibility', "visible")
+                .style('opacity', 1)
             })
 
             function zoom_actions(event){
@@ -198,29 +190,31 @@ function LastViz(props) {
               process = 1 - process;
             }
             drawChart()
-            window.addEventListener('resize', drawChart );
+            window.addEventListener('resize', drawChart ); 
+            window.onpopstate = function() {
+              window.removeEventListener('resize', drawChart);
+            }
+            
         },
         [last_data]
       );
 
         return (
           <div id="d3">
-              <svg
-                id="viz"
-                ref={ref}
-                style={{
-                  height: (window.innerHeight),  
-                  marginRight: "0px",
-                  marginLeft: "0px",
-                  cursor: "grab",
-                }}
-                viewBox="0 0 1000 1000"
-                preserveAspectRatio="xMidYMid meet"
-              >
-                <defs>
-                  
-                </defs>
-              </svg>
+            <svg
+              id="viz"
+              ref={ref}
+              style={{
+                marginTop: "25px",
+                marginRight: "0px",
+                marginLeft: "0px",
+                cursor: "grab",
+              }}
+              viewBox="0 0 1000 1000"
+              preserveAspectRatio="xMidYMid meet"
+            >
+              <defs></defs>
+            </svg>
           </div>
           );
 

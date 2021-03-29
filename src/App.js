@@ -1,31 +1,10 @@
 import React, { Component } from 'react';
-import { Switch, Route} from 'react-router-dom';
+import { Switch, Route, withRouter} from 'react-router-dom';
 import Search from './pages/Search.js';
 import Home from './pages/Home.js';
 import { getSpotifyToken } from './config/functions';
 
-
 class App extends Component{
-
-  returnThemeBasedOnOS() {
-    const body = document.body
-    let pref = window.matchMedia('(prefers-color-scheme: dark)')
-    if (pref.matches) {
-      body.classList.add('dark')
-      body.classList.remove('light')
-    }
-    else {
-      pref = window.matchMedia('(prefers-color-scheme: light)')
-      if (pref.matches) {
-        body.classList.add('light')
-        body.classList.remove('dark')
-      }
-      else {
-        body.classList.add('light')
-        body.classList.remove('dark')
-      }
-    }
-  }
   authSpot(){
     var token = getSpotifyToken();
     token.then((response) => {
@@ -44,11 +23,11 @@ class App extends Component{
   componentDidMount() {
     this.authSpot();
   }
+
   
   render() {
     let home;
     let search;
-    const { location, history } = this.props
 
     if(JSON.parse(localStorage.getItem('params')) !== null){
       const spot_token = JSON.parse(localStorage.getItem('params'));
@@ -65,19 +44,15 @@ class App extends Component{
     }
     return (
       <div className="wrapper">
-        <header className="app-header">
-  
-        </header>
+        <header className="app-header"></header>
         <Switch>
             {home}
             {search}
         </Switch>
-        <footer className="app-footer">
-
-        </footer>
+        <footer className="app-footer"></footer>
       </div>
     );
   }
 }
 
-export default App;
+export default withRouter(App);

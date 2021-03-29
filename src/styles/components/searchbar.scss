@@ -1,7 +1,7 @@
 @import '../colors';
 
 #home-search{
-    animation: fadein 2s;
+    animation: fadein 1s;
     width: 400px;
     @media screen and (max-width: 400px) {
         width: 300px;
@@ -21,7 +21,7 @@
         }
         background-color: #171717;
         color: white;
-        font-size: 2em;
+        font-size: 1.75em;
         border-radius: 10px;
         border-color:transparent;
         padding: .1em .25em;

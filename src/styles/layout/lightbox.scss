@@ -33,6 +33,7 @@
         }
     }
     .close-icon {
+        transition: color 0.25s ease-in;
         text-align: unset;
         left: 0;
         display: initial;

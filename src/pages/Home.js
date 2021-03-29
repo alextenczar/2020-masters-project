@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
 import SearchBar from '../components/SearchBar.js';
 import '../styles/pages/home.scss';
+import {drawChart} from '../components/LastViz';
+    
 
 class Home extends Component {
     constructor() {
         super();
     }
-    
 
     render() {
         let searchbar;
