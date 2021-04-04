@@ -10,11 +10,9 @@
     src: local('Montserrat Bold'), url('../../static/fonts/montserrat/Montserrat-Bold.ttf');
 }
 html {
-    height: 100vh;
     background-color: $background-dark;
 }
 body {
-    height: 100%;
     font-family: "Montserrat-Regular";
     margin: 0;
     color: $text-dark;

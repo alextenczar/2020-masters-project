@@ -121,7 +121,12 @@
         }
     }
     .lightbox-title {
-        margin: .75em 0 0 0;
+        text-align: center;
+        margin: .75em auto;
+        @media screen and (max-width: 400px) {
+            word-break: break-word;
+            max-width: 250px;
+        }
     }
 
     .lightbox-container {

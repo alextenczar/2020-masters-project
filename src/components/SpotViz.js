@@ -87,21 +87,29 @@ function SpotViz(props) {
               .on("mousemove", mousemove)
               .on("mouseleave", mouseleave)
               .on("click", function(d){
-                const artist = d.target.__data__;
+                console.log(d.target.__data__);
+                let artist = d.target.__data__;
                 const artist_link = "/search/" + artist.name.replace(/\s/g, '+');
-                var clicks = 0;
-                if( navigator.userAgent.match(/Android/i)
-                  || navigator.userAgent.match(/webOS/i)
-                  || navigator.userAgent.match(/iPhone/i)
-                  || navigator.userAgent.match(/iPad/i)
-                  || navigator.userAgent.match(/iPod/i)
-                  || navigator.userAgent.match(/BlackBerry/i)
-                  || navigator.userAgent.match(/Windows Phone/i)
-                  && clicks == 0) {
-                    clicks += 1;
+                if(navigator.userAgent.match(/Android/i)
+                || navigator.userAgent.match(/webOS/i)
+                || navigator.userAgent.match(/iPhone/i)
+                || navigator.userAgent.match(/iPad/i)
+                || navigator.userAgent.match(/iPod/i)
+                || navigator.userAgent.match(/BlackBerry/i)
+                || navigator.userAgent.match(/Windows Phone/i)) {
+                  if(d.target.__data__.clicked != true) {
+                    for(var i = 0; i < data.length; i++) {
+                      if(data[i].name != d.target.__data__.name && data[i].clicked == true) {
+                        data[i].clicked = false;
+                      }
+                    }
+                    d.target.__data__.clicked = true;
                   } else {
                     redirect(artist_link);
                   }
+                } else {
+                  redirect(artist_link);
+                }
               })
               
 
