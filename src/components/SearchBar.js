@@ -116,7 +116,7 @@ class SearchBar extends Component {
                     suggestionBox.classList.add("populated");
                     const artist_name = last_results[i].name;
                     const artist_link = "/search/" + artist_name.replace(/\s/g, '+');
-                    suggestions.push(<Link to={{pathname:artist_link, state: spot_results[k]}} className="artist-link" key={artist_name}>{artist_name}</Link>);
+                    suggestions.push(<Link to={{pathname:artist_link}} className="artist-link" key={artist_name}>{artist_name}</Link>);
                     break;
                 }
             }
