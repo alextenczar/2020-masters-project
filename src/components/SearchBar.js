@@ -1,15 +1,14 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 import '../styles/components/searchbar.scss';
-import { Link } from 'react-router-dom';
+import { Link, withRouter} from 'react-router-dom';
 import {ReactComponent as Search} from '../static/icons/search.svg';
-
+import PropTypes from "prop-types";
 
 const last_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.search&artist=';
 const last_top_chart_url = 'https://ws.audioscrobbler.com/2.0/?method=chart.gettopartists&api_key=';
 const spot_url = 'https://api.spotify.com/v1/search?q=';
 const {REACT_APP_LAST_API_KEY, REACT_APP_SPOTIFY_CLIENT, REACT_APP_SPOTIFY_SECRET} = process.env;
-
 
 class SearchBar extends Component {
     constructor() {
@@ -20,6 +19,11 @@ class SearchBar extends Component {
         this.getLast = this.getLast.bind(this);
         this.getSpot = this.getSpot.bind(this);
     }
+
+    static propTypes = {
+        location: PropTypes.object.isRequired,
+        history: PropTypes.object.isRequired
+    };
 
 
     getLast = () => {
@@ -91,10 +95,10 @@ class SearchBar extends Component {
     }
     
     handleSubmit(e) {
+        const {history} = this.props;
         e.preventDefault();
-        this.setState({ submit: this.state.search }, () =>
-            {}
-        );
+        const artist_link = "/search/" + this.state.search.replace(/\s/g, '+');
+        history.push(artist_link);
     } 
 
 
@@ -137,4 +141,4 @@ class SearchBar extends Component {
         );
     }
 };
-export default SearchBar;
+export default withRouter(SearchBar);

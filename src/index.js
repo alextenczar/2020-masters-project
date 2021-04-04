@@ -4,11 +4,14 @@ import './styles/layout/index.scss';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {BrowserRouter, Switch, Route} from 'react-router-dom';
+import {Helmet, HelmetProvider} from 'react-helmet-async';
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
+    <HelmetProvider>
       <App />
+    </HelmetProvider>
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')

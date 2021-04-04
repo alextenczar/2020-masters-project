@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import {useD3} from '../hooks/UseD3.js';
-import { Link, Redirect, useHistory , useLocation} from 'react-router-dom';
+import { Link, Redirect, useHistory, useLocation} from 'react-router-dom';
 import { drag, scaleSqrt, schemeGnBu, zoom } from 'd3';
 import '../styles/pages/viz.scss';
 
@@ -112,11 +112,23 @@ function LastViz(props) {
             .on("click", function(d){
               const artist = d.target.__data__;
               const artist_link = "/search/" + artist.name.replace(/\s/g, '+');
-              redirect(artist_link);
+              var clicks = 0;
+              if( navigator.userAgent.match(/Android/i)
+                || navigator.userAgent.match(/webOS/i)
+                || navigator.userAgent.match(/iPhone/i)
+                || navigator.userAgent.match(/iPad/i)
+                || navigator.userAgent.match(/iPod/i)
+                || navigator.userAgent.match(/BlackBerry/i)
+                || navigator.userAgent.match(/Windows Phone/i)
+                && clicks == 0) {
+                  clicks += 1;
+                } else {
+                  redirect(artist_link);
+                }
             })
           
           circles.transition()
-            .delay(1250)
+            .delay(500)
             .duration(2000)
             .attr('r', function(d) {return distanceScale(d.match); });
 
@@ -205,7 +217,7 @@ function LastViz(props) {
               id="viz"
               ref={ref}
               style={{
-                marginTop: "25px",
+                marginTop: "0px",
                 marginRight: "0px",
                 marginLeft: "0px",
                 cursor: "grab",

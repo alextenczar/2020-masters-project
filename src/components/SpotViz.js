@@ -59,7 +59,7 @@ function SpotViz(props) {
             }
             var mousemove = function(event,d) {
               Tooltip
-                .html(d.name + "<br>Popularity: " + d.popularity)
+                .html(d.name + "<br>Popularity: " + d.popularity + "/100")
                 .style("left", (event.pageX+20) + "px")
                 .style("top", (event.pageY) + "px")
             }
@@ -89,7 +89,19 @@ function SpotViz(props) {
               .on("click", function(d){
                 const artist = d.target.__data__;
                 const artist_link = "/search/" + artist.name.replace(/\s/g, '+');
-                redirect(artist_link);
+                var clicks = 0;
+                if( navigator.userAgent.match(/Android/i)
+                  || navigator.userAgent.match(/webOS/i)
+                  || navigator.userAgent.match(/iPhone/i)
+                  || navigator.userAgent.match(/iPad/i)
+                  || navigator.userAgent.match(/iPod/i)
+                  || navigator.userAgent.match(/BlackBerry/i)
+                  || navigator.userAgent.match(/Windows Phone/i)
+                  && clicks == 0) {
+                    clicks += 1;
+                  } else {
+                    redirect(artist_link);
+                  }
               })
               
 
@@ -131,7 +143,7 @@ function SpotViz(props) {
               .on('tick', ticked)
 
             circles.transition()
-            .delay(1250)
+            .delay(500)
             .duration(2000)
             .attr('r', function(d) {return distanceScale(d.popularity / 100); });
 

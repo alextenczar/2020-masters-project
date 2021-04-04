@@ -10,6 +10,7 @@ import {ReactComponent as PauseButton} from '../static/icons/pause.svg';
 import {ReactComponent as LastIcon} from '../static/icons/lastfm.svg';
 import {ReactComponent as SpotifyIcon} from '../static/icons/spotify.svg';
 import {ReactComponent as Close} from '../static/icons/close.svg';
+import {Helmet} from 'react-helmet-async';
 
 
 const last_similar_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=';
@@ -36,12 +37,12 @@ class SimilarArtists extends Component {
     }
 
     async getLast(){
-        const lastPromise = await axios.get(`${last_similar_url}${this.state.artist}&api_key=${REACT_APP_LAST_API_KEY}&format=json`)
+        const lastPromise = await axios.get(`${last_similar_url}${this.state.spotArtistObject.name}&api_key=${REACT_APP_LAST_API_KEY}&format=json`)
         return lastPromise;
     }
 
     getLastSearch = () => {
-        axios.get(`${last_search_url}${this.state.artist}&api_key=${REACT_APP_LAST_API_KEY}&format=json`)
+        axios.get(`${last_search_url}${this.state.spotArtistObject.name}&api_key=${REACT_APP_LAST_API_KEY}&format=json`)
         .then(({ data }) => {
             if(typeof data.artist !== "undefined") {
                 this.setState({lastArtistObject: data.artist});
@@ -60,19 +61,33 @@ class SimilarArtists extends Component {
         })
         .then(({ data }) => {
             if(typeof data.artists !== "undefined" && this.state.artist !== "") {
+                let found = false;
                 const name_fixed = this.state.artist.replace(/\+/g, ' ');
                 for(var k = 0; k < data.artists.items.length; k++) {
+                    console.log(data.artists.items[k].name.toUpperCase());
+                    console.log(name_fixed.toUpperCase())
                     if(data.artists.items[k].name.toUpperCase().localeCompare(name_fixed.toUpperCase()) == 0) {
+                        found = true;
                         const filteredSpotSingleArtist = data.artists.items[k];
                         if(filteredSpotSingleArtist.images.length == 0) {
                             filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
                             filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
                             filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
                         }
-                        this.setState({spotArtistObject: filteredSpotSingleArtist}, () => {this.getSpotSimilar(); this.getSpotTopTracks();});
+                        this.setState({spotArtistObject: filteredSpotSingleArtist}, () => { this.getLastSearch(); this.getSpotSimilar(); this.getSpotTopTracks();});
                         this.setState({route_changed: 1});
                         break;
                     }
+                }
+                if(found == false) {
+                    const filteredSpotSingleArtist = data.artists.items[0];
+                    if(filteredSpotSingleArtist.images.length == 0) {
+                        filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
+                        filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
+                        filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
+                    }
+                    this.setState({spotArtistObject: filteredSpotSingleArtist}, () => { this.getLastSearch(); this.getSpotSimilar(); this.getSpotTopTracks();});
+                    this.setState({route_changed: 1});
                 }
             }
         })
@@ -178,7 +193,6 @@ class SimilarArtists extends Component {
         this.setState({artist: this.props.artist}, () =>
         {
             this.getSpotSearch();
-            this.getLastSearch();
         });
     }
 
@@ -193,7 +207,6 @@ class SimilarArtists extends Component {
                 this.setState({spotFinalArtists: []});
                 this.setState({spotArtists: []});
                 this.getSpotSearch();
-                this.getLastSearch();
             })
         }
     }
@@ -243,17 +256,19 @@ class SimilarArtists extends Component {
         const toptracks = this.state.spotTopTracks;
         let tracks = [];
         let genreContainer;
-        let lightbox;
         let viz;
         let sourceArtist;
         let sourceArtistImage;
+        let title = <Helmet>
+                        <title>BandViz</title>
+                    </Helmet>
 
         if(this.state.route_changed == 1) {sourceArtistImage = <div id="source-artist-image" style={{backgroundImage: `url(${sao.images[0].url})`}}></div>
         }else{sourceArtist = <></>}
         
-        if(typeof sao !== "undefined" && typeof sao.images !== "undefined" && typeof lao !== "undefined" && typeof lao.bio !== "undefined") {
+        if(typeof sao !== "undefined" && typeof sao.images !== "undefined") {
             var genreLength = sao.genres.length;
-            let genreTitle = "Genre(s)"
+            let genreTitle = "Genres"
             if(genreLength == 1) { genreTitle = "Genre"}
             if(genreLength > 6) { genreLength = 6}
             for(var i = 0; i < genreLength; i++) {
@@ -266,6 +281,10 @@ class SimilarArtists extends Component {
                     {genres}
                 </ul>
             }
+
+            title = <Helmet>
+                        <title>BandViz - {sao.name}</title>
+                    </Helmet>
 
             if(typeof toptracks !== "undefined") {
                 var track_count = 0;
@@ -291,8 +310,11 @@ class SimilarArtists extends Component {
                 }
             }
   
-            let last_link = <a id="last_link" href={lao.url}><LastIcon/></a>
-            let spot_link = <a id="spot_link" href={sao.external_urls.spotify}><SpotifyIcon/></a>
+            let last_link = <></>
+            if(typeof lao.url != "undefined") {
+                last_link = <a id="last_link" href={lao.url} target="_blank" rel="noopener noreferrer"><LastIcon/></a>
+            }
+            let spot_link = <a id="spot_link" href={sao.external_urls.spotify} target="_blank" rel="noopener noreferrer"><SpotifyIcon/></a>
             sourceArtist = 
                 <div key={sao.name}> 
                     <h1 id="artist-title" onClick={this.showLightbox} style={{ visibility: this.state.lightboxVisibility ? "hidden" : "visible", opacity: this.state.lightboxVisibility ? "0" : "1"}}>{sao.name}</h1>
@@ -327,27 +349,28 @@ class SimilarArtists extends Component {
                             lowest = last_results[k].match
                         }
                     }
-                    if(typeof last_results[k] !== "undefined" && typeof spot_results[k] !== "undefined" && typeof spot_results[k].images !== "undefined" && spot_results[k] !== 'null') {
+/*                     if(typeof last_results[k] !== "undefined" && typeof spot_results[k] !== "undefined" && typeof spot_results[k].images !== "undefined" && spot_results[k] !== 'null') {
                         if(typeof spot_results[k].images[2] !== "undefined") {
                             const artist_name = last_results[k].name;
                             const artist_link = "/search/" + artist_name.replace(/\s/g, '+');
                         }
-                    }                
+                    }     */            
             }
             viz = <LastViz lastResults={this.state.lastFinalArtists} artist = {this.state.spotArtistObject} lowest={lowest} spotResults={this.state.spotFinalArtists}></LastViz>
         }
         if(this.state.spotArtists.length !== 0 && this.state.lastFinalArtists.length === 0){ //if last.fm similar artists don't exist, render spotify's similar artists.
-            for(var l = 0; l < this.state.spotArtists.length; l++) {
+/*             for(var l = 0; l < this.state.spotArtists.length; l++) {
                 const spot_results = this.state.spotArtists;
                 const artist_name = spot_results[l].name;
                 const artist_link = "/search/" + artist_name.replace(/\s/g, '+');
-            }
+            } */
             viz = <SpotViz spotResults={this.state.spotArtists}></SpotViz>
         }
 
 
         return (
             <div>
+                {title}
                 {sourceArtistImage}
                 {sourceArtist}
                 {viz}

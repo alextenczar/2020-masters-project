@@ -1,6 +1,6 @@
-import {Link, useParams} from "react-router-dom";
+import {Link, useParams, useHistory} from "react-router-dom";
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import SimilarArtists from '../components/SimilarArtists.js';
 import '../styles/pages/search.scss';
 import {ReactComponent as Back} from '../static/icons/back.svg';
@@ -14,6 +14,8 @@ function Search(props) {
     const last_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=';
     const spot_url = 'https://api.spotify.com/v1/search?q=';
     const spot_token = JSON.parse(localStorage.getItem('params'));
+    let history = useHistory();
+
     useEffect(() => {
         if(spot_token === null) {
             setTimeout(() => { }, 100);
@@ -33,13 +35,16 @@ function Search(props) {
             if(typeof data.artists !== "undefined" && name !== "") {
                 setSpotArtistInfo(data.artists.items[0]);
             }
+            if(data.artists.items.length == 0 || typeof data.artists == "undefined") {
+                history.push('/404')
+            }
         })
     }, []);
 
-    if (Object.keys(spotArtistInfo).length !==0) {
+    if (typeof spotArtistInfo !== "undefined") {
         return (
             <>
-                <Link to="/" id="back-link" key="back"><Back id="back-button"/></Link>
+                <a id="back-link" href="/"><Back id="back-button"/></a>
                 <SimilarArtists artist={name} type={props.type} token={props.token}></SimilarArtists>
             </>
         )

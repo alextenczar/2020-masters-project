@@ -33,7 +33,7 @@
         }
     }
     .close-icon {
-        transition: color 0.25s ease-in;
+        transition: color 0.125s ease-in;
         text-align: unset;
         left: 0;
         display: initial;
@@ -49,7 +49,10 @@
         }
     }
     #last_link:hover {
-        color: #d92323;
+        color: $lastfm-color;
+    }
+    #spot_link:hover {
+        color: $spotify-color;
     }
     .track-wrapper {
         display: flex;
@@ -80,7 +83,7 @@
         height: 1.25em;
         margin: 1.25em;
         .track-icon {
-            transition: color 0.25s ease-in;
+            transition: color 0.125s ease-in;
             width: 1em;
             height: auto;
             color: white;

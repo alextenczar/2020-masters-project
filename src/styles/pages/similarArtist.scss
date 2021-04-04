@@ -1,6 +1,7 @@
 @import '../colors';
 
 #artist-title {
+    font-weight: 900;
     margin-top: .5em;
     text-align: center;
     z-index: 1;
@@ -16,7 +17,7 @@
     transition: visibility .5s, opacity .5s linear, color 0.25s ease-in;
     &:hover {
         cursor: pointer;
-        color: $accent-light;
+        color: $accent-dark;
         text-decoration: none;
     }
 }

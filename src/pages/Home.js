@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import SearchBar from '../components/SearchBar.js';
 import '../styles/pages/home.scss';
-import {drawChart} from '../components/LastViz';
+import {ReactComponent as Logo} from '../static/icons/bandviz-logo.svg';
     
 
 class Home extends Component {
@@ -16,8 +16,16 @@ class Home extends Component {
         }
         return (
             <div id="home">
-                {searchbar}
+                <div className="searchbar-container">
+                    <Logo></Logo>
+                    <h1>BandViz</h1>
+                    {searchbar}
+                </div>
+                <div className="app-footer">
+                    <p>built w/ ♥ by <a href="https://alextenczar.com" target="_blank" rel="noopener noreferrer">Alex Tenczar</a>, Source Code available at <a href="https://github.com/alextenczar/bandviz.com" target="_blank" rel="noopener noreferrer">alextenczar/bandviz.com</a></p>
+                </div>
             </div>
+            
         );
     }
 };
