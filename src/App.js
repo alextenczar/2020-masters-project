@@ -25,11 +25,21 @@ class App extends Component{
     this.authSpot();
   }
 
-  
+  forceScrollTop() {
+    var scrollTop = window.scrollTop();
+    if (scrollTop != 0) {
+      window.scrollTop(0);
+      window.off('scroll', this.forceScrollTop);
+    }
+  }
+
   render() {
     let home;
     let search;
     let notFound;
+    if (typeof window !== "undefined") {
+      window.addEventListener('scroll', this.forceScrollTop)
+    }
 
     if(JSON.parse(localStorage.getItem('params')) !== null){
       const spot_token = JSON.parse(localStorage.getItem('params'));

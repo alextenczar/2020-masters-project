@@ -1,4 +1,7 @@
 .searchbar-container {
+  @media screen and (max-device-width: 480px) and (orientation: portrait) {
+    top: 1em;
+  }
   margin:auto;
   position: fixed;
   top: 25%;
