@@ -110,18 +110,18 @@ function LastViz(props) {
             .on("mousemove", mousemove)
             .on("mouseleave", mouseleave)
             .on("click", function(d){
-              const artist = d.target.__data__;
+              console.log(d.target.__data__);
+              let artist = d.target.__data__;
               const artist_link = "/search/" + artist.name.replace(/\s/g, '+');
-              var clicks = 0;
-              if( navigator.userAgent.match(/Android/i)
+              if(artist.clicked != true 
+                && navigator.userAgent.match(/Android/i)
                 || navigator.userAgent.match(/webOS/i)
                 || navigator.userAgent.match(/iPhone/i)
                 || navigator.userAgent.match(/iPad/i)
                 || navigator.userAgent.match(/iPod/i)
                 || navigator.userAgent.match(/BlackBerry/i)
-                || navigator.userAgent.match(/Windows Phone/i)
-                && clicks == 0) {
-                  clicks += 1;
+                || navigator.userAgent.match(/Windows Phone/i)) {
+                  d.target.__data__.clicked = true;
                 } else {
                   redirect(artist_link);
                 }
