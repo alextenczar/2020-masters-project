@@ -9,11 +9,19 @@ const last_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.search&artist
 const last_top_chart_url = 'https://ws.audioscrobbler.com/2.0/?method=chart.gettopartists&api_key=';
 const spot_url = 'https://api.spotify.com/v1/search?q=';
 const {REACT_APP_LAST_API_KEY, REACT_APP_SPOTIFY_CLIENT, REACT_APP_SPOTIFY_SECRET} = process.env;
+var text = "this text changes"
 
 class SearchBar extends Component {
     constructor() {
         super();
-        this.state = { search: '', submit: '', last_results: [], spot_results: [], last_top_chart: [],}
+        this.state = { 
+            search: '', 
+            submit: '', 
+            last_results: [], 
+            spot_results: [], 
+            last_top_chart: [],
+            chart_index: 0,
+        }
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.getLast = this.getLast.bind(this);
@@ -47,7 +55,6 @@ class SearchBar extends Component {
         axios.get(`${last_top_chart_url}${REACT_APP_LAST_API_KEY}&format=json`)
         .then(({ data }) => {
             if(typeof data !== "undefined") {
-                console.log(data);
                 this.setState({
                     last_top_chart: data.artists.artist
                 })
@@ -82,8 +89,14 @@ class SearchBar extends Component {
     }
     componentDidMount(){
         this.getLastTopChart();
+        setTimeout(() => {
+            this.inputInterval = setInterval(this.changeText, 2000);
+        }, 1000);
     }
 
+    componentWillUnmount(){
+        clearInterval(this.inputInterval);
+    }
 
     handleChange(e){
         this.setState({ search: e.target.value }, () =>
@@ -101,8 +114,22 @@ class SearchBar extends Component {
         history.push(artist_link);
     } 
 
+    getChangedText = () => {
+        if(this.state.chart_index == 49) {
+            var i = 0;
+        } else { var i = this.state.chart_index + 1; }
+        this.setState({chart_index: i});
+        return this.state.last_top_chart[i].name;
+    }
+
+    changeText = () => {
+        var placeholderTxt = this.getChangedText();
+        document.getElementById("search-box").setAttribute('placeholder',placeholderTxt);
+    }
+
 
     render() {
+        var i = 0;
         const last_results = this.state.last_results
         const spot_results = this.state.spot_results
         const suggestions = [] 
@@ -127,8 +154,6 @@ class SearchBar extends Component {
         }
         if(typeof this.state.last_top_chart[0] !== 'undefined' && typeof document.querySelector('#search-box') !== null) {
             top_chart_suggestions = this.state.last_top_chart;
-            console.log(document.querySelector('#search-box'));
-            //this.typeWriter("#search-box", this.state.last_top_chart, true);
         }
      
         return (
