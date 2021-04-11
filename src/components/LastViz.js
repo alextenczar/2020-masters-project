@@ -2,24 +2,20 @@ import React, { Component } from 'react';
 import * as d3 from 'd3';
 import {useD3} from '../hooks/UseD3.js';
 import { Link, Redirect, useHistory, useLocation} from 'react-router-dom';
-import { drag, scaleSqrt, schemeGnBu, zoom } from 'd3';
+import {scaleSqrt} from 'd3';
 import '../styles/pages/viz.scss';
 
 function LastViz(props) {
+    console.log(navigator.maxTouchPoints)
     const spotify_data = props.spotResults;
     const last_data = props.lastResults;
     const lowest = props.lowest;
     const history = useHistory();
     const location = useLocation();
     const currentUrl = window.location.href;
-    //const data = props.lastResults;
     const redirect = d => {
       history.push(d);
     }
-
-/*     window.onpopstate = function() {
-      window.location.reload(true);
-    }; */
 
     React.useEffect(() => {
       d3.selectAll("#viz > *").remove();
@@ -41,7 +37,6 @@ function LastViz(props) {
             var distanceScale = d3.scaleSqrt().domain([lowest, 1]).range([30, 70])
             var defs = svg.append("defs");
 
-            // charge is dependent on size of the bubble, so bigger towards the middle
             function charge(d) {
               return -Math.pow(distanceScale(d.match), 2.0) * .3;
             }
@@ -119,7 +114,8 @@ function LastViz(props) {
               || navigator.userAgent.match(/iPod/i)
               || navigator.userAgent.match(/BlackBerry/i)
               || navigator.userAgent.match(/Windows Phone/i)
-              || navigator.userAgent.match(/Windows Phone/i)) {
+              || navigator.userAgent.match(/Windows Phone/i)
+              ) {
                 if(d.target.__data__.clicked != true) {
                   for(var i = 0; i < data.length; i++) {
                     if(data[i].name != d.target.__data__.name && data[i].clicked == true) {

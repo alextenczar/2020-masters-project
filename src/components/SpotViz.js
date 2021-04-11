@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import * as d3 from 'd3';
 import {useD3} from '../hooks/UseD3.js';
 import { Link, Redirect, useHistory , useLocation} from 'react-router-dom';
-import { drag, scaleSqrt, schemeGnBu } from 'd3';
 import '../styles/pages/viz.scss';
 
 function SpotViz(props) {
@@ -95,7 +94,8 @@ function SpotViz(props) {
                 || navigator.userAgent.match(/iPad/i)
                 || navigator.userAgent.match(/iPod/i)
                 || navigator.userAgent.match(/BlackBerry/i)
-                || navigator.userAgent.match(/Windows Phone/i)) {
+                || navigator.userAgent.match(/Windows Phone/i)
+                || navigator.maxTouchPoints > 0) {
                   if(d.target.__data__.clicked != true) {
                     for(var i = 0; i < data.length; i++) {
                       if(data[i].name != d.target.__data__.name && data[i].clicked == true) {

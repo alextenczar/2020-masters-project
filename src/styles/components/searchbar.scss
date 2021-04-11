@@ -15,7 +15,7 @@
         background-color: white;
         text-indent: 1.25em;
         width: 95%;
-        @media screen and (max-width: 750px) {
+        @media screen and (max-width: 770px) {
             font-size: 1.25em;
             width: 280px;
             text-indent: 1.5em;
@@ -49,9 +49,9 @@ input + .suggestions-container{
 }
 input + #suggestion-box{
     display: none;
-    width: 99.5%;
-    @media screen and (max-width: 400px) {
-        width: 98%;
+    width: 99.25%;
+    @media screen and (max-width: 770px) {
+        width: 100%;
     }
 }
 input + #suggestion-box.populated{

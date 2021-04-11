@@ -1,4 +1,5 @@
 .searchbar-container {
+  z-index: 1;
   @media screen and (max-device-width: 480px) and (orientation: portrait) {
     top: 1em;
   }
@@ -20,9 +21,6 @@
   }
 }
 .app-footer {
-  @media screen and (max-height: 700px) {
-    display: none;
-  }
   text-align: center;
   position: fixed;
   bottom: 0;
