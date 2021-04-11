@@ -94,23 +94,29 @@ class SearchBar extends Component {
         const message = 'Search for artists like...';
         setTimeout(() => {
             this.messageInterval = setInterval(function () {
-                timesRun += 1;
-                if (timesRun > message.length) {
-                    clearInterval(func.messageInterval);
+                if (!document.hidden) {
+                    timesRun += 1;
+                    if (timesRun > message.length) {
+                        clearInterval(func.messageInterval);
+                    }
+                    document.getElementById("search-box").setAttribute('placeholder', message.slice(0, timesRun));
                 }
-                document.getElementById("search-box").setAttribute('placeholder', message.slice(0, timesRun));
-            }, 2000 / message.length);
+            }, 2000 / message.length); 
             setTimeout(() => {
                 this.inputInterval = setInterval(() => {
-                    let artist_index = this.state.chart_index;
-                    this.changeText(artist_index);
-                    if (this.state.chart_index == 49) {
-                        var i = 0;
-                    } else { var i = this.state.chart_index + 1; }
-                    this.setState({ chart_index: i });
+                    if (!document.hidden) {
+                        let artist_index = this.state.chart_index;
+                        this.changeText(artist_index);
+                        if (this.state.chart_index == 49) {
+                            var i = 0;
+                        } else { var i = this.state.chart_index + 1; }
+                        this.setState({ chart_index: i });
+                    }
                 }, 2500);
             }, 2000);
         }, 1000);
+
+
     }
 
     componentWillUnmount(){
