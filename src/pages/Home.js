@@ -22,7 +22,7 @@ class Home extends Component {
                     {searchbar}
                 </div>
                 <div className="app-footer">
-                    <p>built by <a href="https://alextenczar.com" target="_blank" rel="noopener noreferrer">Alex Tenczar</a>, Source Code available at <a href="https://github.com/alextenczar/bandviz.com" target="_blank" rel="noopener noreferrer">alextenczar/bandviz.com</a></p>
+                    <p>built by <a href="https://alextenczar.com" target="_blank" rel="noopener noreferrer">Alex Tenczar</a></p>
                 </div>
             </div>
             

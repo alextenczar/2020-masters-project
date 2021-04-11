@@ -3,23 +3,23 @@
 #artist-title {
     word-break: break-word;
     font-weight: 900;
-    margin-top: .5em;
+    margin-top: .35em;
     text-align: center;
     z-index: 1;
     position: absolute;
     left: 50%;
     transform: translate(-50%, 0);
-    background-color: rgba(0,0,0,.5);
+    background-color: rgba(38,38,38,.8);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    padding: .25em;
-    border-radius: 10px;
+    padding: .40em;
+    border-radius: 30px;
     animation: fadein 1s ease-in;
-    transition: visibility .5s, opacity .5s linear, color 0.25s ease-in;
+    text-decoration: none;
+    transition: visibility .5s, opacity .5s linear, color 0.25s, background-color 0.25s ease-in;
     &:hover {
         cursor: pointer;
         color: $accent-dark;
-        text-decoration: none;
     }
     @media screen and (max-width: 400px) {
         margin-top: .9em;

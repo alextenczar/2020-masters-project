@@ -41,9 +41,9 @@ function SpotViz(props) {
               .append("div")
               .style("opacity", 0)
               .attr("class", "tooltip")
-              .style("background-color", "rgba(0, 0, 0, 0.75)")
-              .style("border-radius", "5px")
-              .style("padding", "10px")
+              .style("background-color", "rgba(38, 38, 38, 0.8)")
+              .style("border-radius", "30px")
+              .style("padding", "12px")
               .style("position", "absolute")
               .style("color", "white")
               .style("backdrop-filter", "blur(10px)")
@@ -87,7 +87,6 @@ function SpotViz(props) {
               .on("mousemove", mousemove)
               .on("mouseleave", mouseleave)
               .on("click", function(d){
-                console.log(d.target.__data__);
                 let artist = d.target.__data__;
                 const artist_link = "/search/" + artist.name.replace(/\s/g, '+');
                 if(navigator.userAgent.match(/Android/i)

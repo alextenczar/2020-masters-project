@@ -41,7 +41,7 @@ class SimilarArtists extends Component {
         return lastPromise;
     }
 
-    getLastSearch = () => {
+    async getLastSearch(){
         axios.get(`${last_search_url}${this.state.spotArtistObject.name}&api_key=${REACT_APP_LAST_API_KEY}&format=json`)
         .then(({ data }) => {
             if(typeof data.artist !== "undefined") {
@@ -50,7 +50,7 @@ class SimilarArtists extends Component {
         })
     }
 
-    getSpotSearch(){ //used for querying search artist and creating artist object
+    async getSpotSearch(){ //used for querying search artist and creating artist object
         this.setState({route_changed: 0});
         axios.get(`${spot_search_url}${this.state.artist}&type=artist&limit=10`, {
             headers: {
@@ -64,8 +64,6 @@ class SimilarArtists extends Component {
                 let found = false;
                 const name_fixed = this.state.artist.replace(/\+/g, ' ');
                 for(var k = 0; k < data.artists.items.length; k++) {
-                    console.log(data.artists.items[k].name.toUpperCase());
-                    console.log(name_fixed.toUpperCase())
                     if(data.artists.items[k].name.toUpperCase().localeCompare(name_fixed.toUpperCase()) == 0) {
                         found = true;
                         const filteredSpotSingleArtist = data.artists.items[k];
@@ -93,7 +91,7 @@ class SimilarArtists extends Component {
         })
     }
 
-    getSpotTopTracks = () => {
+    async getSpotTopTracks(){
         if(spot_token === null) {
             setTimeout(() => { }, 100);
         }
@@ -127,7 +125,7 @@ class SimilarArtists extends Component {
         return comparison;
     }
 
-    getSpotSimilar = () => {
+    async getSpotSimilar(){
         let initialLastArtistArray = [];
         const filteredLastArtistArray = [];
         const filteredSpotArtistArray = [];
@@ -151,10 +149,10 @@ class SimilarArtists extends Component {
             else if(initialLastArtistArray.length > 0) { //if last.fm returned any similar artists
                 var z = 0;
                 var length = initialLastArtistArray.length;
-                if(length > 75) { length = 75}
-                for(var i = 0; i < initialLastArtistArray.length; i++) {
+                if(length > 55) { length = 55}
+                for(var i = 0; i < length; i++) {
                     const similarQuery = initialLastArtistArray[i];
-                    promises.push(axios.get(`${spot_search_url}${similarQuery.name}&type=artist&limit=1`, {
+                    promises.push(axios.get(`${spot_search_url}${similarQuery.name}&type=artist&limit=20`, {
                         headers: {
                             "Accept": "application/json",
                             "Content-Type": "application/json",
@@ -162,16 +160,19 @@ class SimilarArtists extends Component {
                         }
                     })
                     .then(({ data }) => {
-                        const spotifySearchResult = data.artists.items[0]
-                        if(typeof spotifySearchResult !== "undefined" && typeof data.artists !== "undefined" && this.state.artist !== undefined && similarQuery.name.toUpperCase() === spotifySearchResult.name.toUpperCase()) {
-                            if(spotifySearchResult.images.length == 0) {
-                                spotifySearchResult.images.push({url : '/images/default-avatar.png'});
-                                spotifySearchResult.images.push({url : '/images/default-avatar.png'});
-                                spotifySearchResult.images.push({url : '/images/default-avatar.png'});
+                        for(var i = 0; i < data.artists.items.length; i++) {
+                            const spotifySearchResult = data.artists.items[i]
+                            if (typeof spotifySearchResult !== "undefined" && typeof data.artists !== "undefined" && this.state.artist !== undefined && similarQuery.name.toUpperCase() === spotifySearchResult.name.toUpperCase()) {
+                                if (spotifySearchResult.images.length == 0) {
+                                    spotifySearchResult.images.push({ url: '/images/default-avatar.png' });
+                                    spotifySearchResult.images.push({ url: '/images/default-avatar.png' });
+                                    spotifySearchResult.images.push({ url: '/images/default-avatar.png' });
+                                }
+                                filteredLastArtistArray.push(similarQuery);
+                                filteredSpotArtistArray.push(spotifySearchResult);
+                                z++;
+                                break;
                             }
-                            filteredLastArtistArray.push(similarQuery);
-                            filteredSpotArtistArray.push(spotifySearchResult);
-                            z++;
                         }
                     }).catch(err => {
                         return null;
@@ -283,7 +284,7 @@ class SimilarArtists extends Component {
             }
 
             title = <Helmet>
-                        <title>BandViz - {sao.name}</title>
+                        <title>{sao.name} | BandViz</title>
                     </Helmet>
 
             if(typeof toptracks !== "undefined") {

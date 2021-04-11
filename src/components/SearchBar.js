@@ -88,14 +88,35 @@ class SearchBar extends Component {
         }
     }
     componentDidMount(){
+        var func = this;
+        var timesRun = 0;
         this.getLastTopChart();
+        const message = 'Search for artists like...';
         setTimeout(() => {
-            this.inputInterval = setInterval(this.changeText, 2000);
+            this.messageInterval = setInterval(function () {
+                timesRun += 1;
+                if (timesRun > message.length) {
+                    clearInterval(func.messageInterval);
+                }
+                document.getElementById("search-box").setAttribute('placeholder', message.slice(0, timesRun));
+            }, 2000 / message.length);
+            setTimeout(() => {
+                this.inputInterval = setInterval(() => {
+                    let artist_index = this.state.chart_index;
+                    this.changeText(artist_index);
+                    if (this.state.chart_index == 49) {
+                        var i = 0;
+                    } else { var i = this.state.chart_index + 1; }
+                    this.setState({ chart_index: i });
+                }, 2500);
+            }, 2000);
         }, 1000);
     }
 
     componentWillUnmount(){
         clearInterval(this.inputInterval);
+        clearInterval(this.messageInterval);
+        clearInterval(this.interval);
     }
 
     handleChange(e){
@@ -114,17 +135,25 @@ class SearchBar extends Component {
         history.push(artist_link);
     } 
 
-    getChangedText = () => {
-        if(this.state.chart_index == 49) {
-            var i = 0;
-        } else { var i = this.state.chart_index + 1; }
-        this.setState({chart_index: i});
-        return this.state.last_top_chart[i].name;
+    getChangedText(timesRun, artist_index){
+        return this.state.last_top_chart[artist_index].name.slice(0, timesRun);
     }
 
-    changeText = () => {
-        var placeholderTxt = this.getChangedText();
-        document.getElementById("search-box").setAttribute('placeholder',placeholderTxt);
+    changeText = (artist_index) => {
+        var func = this;
+        var timesRun = 0;
+        var nameLeng = this.state.last_top_chart[artist_index].name.length;
+        document.getElementById("search-box").setAttribute('placeholder', "");
+        setTimeout(()=> {
+            func.interval = setInterval(function () {
+                timesRun += 1;
+                if (timesRun > nameLeng) {
+                    clearInterval(func.interval);
+                }
+                var placeholderTxt = func.getChangedText(timesRun, artist_index);
+                document.getElementById("search-box").setAttribute('placeholder', placeholderTxt);
+            }, 1000 / nameLeng);
+        },250);
     }
 
 
@@ -158,7 +187,7 @@ class SearchBar extends Component {
      
         return (
             <form id="home-search" onSubmit={this.handleSubmit} autoComplete="off">
-                <input id="search-box" type="text" value={this.state.search} onChange={this.handleChange} placeholder="Search for..."></input>
+                <input id="search-box" type="text" value={this.state.search} onChange={this.handleChange} placeholder=""></input>
                 <div id="suggestion-box" className="suggestions-container">
                     {suggestions}
                 </div>

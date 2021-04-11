@@ -8,7 +8,7 @@
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    background-color: rgba(38,38,39,.8);
+    background-color: rgba(18,18,18,.8);
     text-align: center;
     transition: visibility .5s, opacity .5s linear;
     .genre-list {
@@ -123,7 +123,7 @@
     .lightbox-title {
         text-align: center;
         margin: .75em auto 0;
-        @media screen and (max-width: 400px) {
+        @media screen and (max-width: 475px) {
             word-break: break-word;
             max-width: 250px;
         }
