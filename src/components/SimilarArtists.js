@@ -1,17 +1,16 @@
 import React, {Component} from 'react';
 import axios from 'axios';
-import LastViz from './LastViz.js';
+import { Helmet } from 'react-helmet-async';
+import LastViz from './LastViz';
 import SpotViz from './SpotViz';
-import '../styles/layout/lightbox.scss';
-import '../styles/pages/similarArtist.scss';
 import ReactAudioPlayer from 'react-audio-player';
 import {ReactComponent as PlayButton} from '../static/icons/play.svg';
 import {ReactComponent as PauseButton} from '../static/icons/pause.svg';
 import {ReactComponent as LastIcon} from '../static/icons/lastfm.svg';
 import {ReactComponent as SpotifyIcon} from '../static/icons/spotify.svg';
 import {ReactComponent as Close} from '../static/icons/close.svg';
-import {Helmet} from 'react-helmet-async';
-
+import '../styles/layout/lightbox.scss';
+import '../styles/pages/similarArtist.scss';
 
 const last_similar_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=';
 const last_search_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=';
@@ -62,11 +61,12 @@ class SimilarArtists extends Component {
         .then(({ data }) => {
             if(typeof data.artists !== "undefined" && this.state.artist !== "") {
                 let found = false;
+                let filteredSpotSingleArtist;
                 const name_fixed = this.state.artist.replace(/\+/g, ' ');
                 for(var k = 0; k < data.artists.items.length; k++) {
                     if(data.artists.items[k].name.toUpperCase().localeCompare(name_fixed.toUpperCase()) == 0) {
                         found = true;
-                        const filteredSpotSingleArtist = data.artists.items[k];
+                        filteredSpotSingleArtist = data.artists.items[k];
                         if(filteredSpotSingleArtist.images.length == 0) {
                             filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
                             filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
@@ -77,15 +77,15 @@ class SimilarArtists extends Component {
                         break;
                     }
                 }
-                if(found == false) {
-                    const filteredSpotSingleArtist = data.artists.items[0];
-                    if(filteredSpotSingleArtist.images.length == 0) {
-                        filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
-                        filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
-                        filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
+                if(found == false) { //return first result if no perfect match found
+                    filteredSpotSingleArtist = data.artists.items[0];
+                    if (filteredSpotSingleArtist.images.length == 0) {
+                        filteredSpotSingleArtist.images.push({ url: '/images/default-avatar.png' });
+                        filteredSpotSingleArtist.images.push({ url: '/images/default-avatar.png' });
+                        filteredSpotSingleArtist.images.push({ url: '/images/default-avatar.png' });
                     }
-                    this.setState({spotArtistObject: filteredSpotSingleArtist}, () => { this.getLastSearch(); this.getSpotSimilar(); this.getSpotTopTracks();});
-                    this.setState({route_changed: 1});
+                    this.setState({ spotArtistObject: filteredSpotSingleArtist }, () => { this.getLastSearch(); this.getSpotSimilar(); this.getSpotTopTracks(); });
+                    this.setState({ route_changed: 1 });
                 }
             }
         })
@@ -230,24 +230,30 @@ class SimilarArtists extends Component {
         });
     }
 
+    audioPause(audio){
+        var trackContainer = document.getElementById(audio + "-container")
+        trackContainer.classList.remove('audio-playing');
+    }
+    audioPlay(audio) {
+        var trackContainer = document.getElementById(audio + "-container")
+        trackContainer.classList.add('audio-playing');
+    }
+    audioEnd(audio) {
+        var track = document.getElementById(audio);
+        var trackContainer = document.getElementById(audio + "-container")
+        track.currentTime = 0;
+        trackContainer.classList.remove('audio-playing');
+    }
+
     previewAudio(audio){
         var track = document.getElementById(audio); 
-        var trackContainer = document.getElementById(audio + "-container")
-        track.addEventListener("pause", function(){
-            trackContainer.classList.remove('audio-playing');
-        });
-        track.addEventListener("play", function() {
-            trackContainer.classList.add('audio-playing');
-        });
-        track.addEventListener("ended", function(){
-            track.currentTime = 0;
-            trackContainer.classList.remove('audio-playing');
-        });
+        track.addEventListener("pause", this.audioPause(audio));
+        track.addEventListener("play", this.audioPlay(audio));
+        track.addEventListener("ended", this.audioEnd(audio));
         if(track !== null && track.readyState !== 0){
             if(track.paused == true){ this.pauseAllAudio(); track.volume = .75; track.play(); }
             else { track.pause(); }
         }
-
     }
 
     render() {
@@ -343,28 +349,16 @@ class SimilarArtists extends Component {
         if(this.state.spotFinalArtists.length > 1 && this.state.spotFinalArtists.length === this.state.lastFinalArtists.length) {    //if last.fm similar artists exist, render them.
             var lowest = 1;
             const last_results = this.state.lastFinalArtists
-            const spot_results = this.state.spotFinalArtists
             for (var k = 0; k < this.state.lastFinalArtists.length; k++) {
-                    if(typeof last_results[k] !== 'undefined') {
-                        if(last_results[k].match < lowest) {
-                            lowest = last_results[k].match
-                        }
+                if(typeof last_results[k] !== 'undefined') {
+                    if(last_results[k].match < lowest) {
+                        lowest = last_results[k].match
                     }
-/*                     if(typeof last_results[k] !== "undefined" && typeof spot_results[k] !== "undefined" && typeof spot_results[k].images !== "undefined" && spot_results[k] !== 'null') {
-                        if(typeof spot_results[k].images[2] !== "undefined") {
-                            const artist_name = last_results[k].name;
-                            const artist_link = "/search/" + artist_name.replace(/\s/g, '+');
-                        }
-                    }     */            
+                }    
             }
             viz = <LastViz lastResults={this.state.lastFinalArtists} artist = {this.state.spotArtistObject} lowest={lowest} spotResults={this.state.spotFinalArtists}></LastViz>
         }
         if(this.state.spotArtists.length !== 0 && this.state.lastFinalArtists.length === 0){ //if last.fm similar artists don't exist, render spotify's similar artists.
-/*             for(var l = 0; l < this.state.spotArtists.length; l++) {
-                const spot_results = this.state.spotArtists;
-                const artist_name = spot_results[l].name;
-                const artist_link = "/search/" + artist_name.replace(/\s/g, '+');
-            } */
             viz = <SpotViz spotResults={this.state.spotArtists}></SpotViz>
         }
 

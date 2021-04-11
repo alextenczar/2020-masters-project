@@ -1,22 +1,20 @@
 import React, {Component} from 'react';
 import axios from 'axios';
-import '../styles/components/searchbar.scss';
 import { Link, withRouter} from 'react-router-dom';
-import {ReactComponent as Search} from '../static/icons/search.svg';
 import PropTypes from "prop-types";
+
+import '../styles/components/searchbar.scss';
 
 const last_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.search&artist=';
 const last_top_chart_url = 'https://ws.audioscrobbler.com/2.0/?method=chart.gettopartists&api_key=';
 const spot_url = 'https://api.spotify.com/v1/search?q=';
-const {REACT_APP_LAST_API_KEY, REACT_APP_SPOTIFY_CLIENT, REACT_APP_SPOTIFY_SECRET} = process.env;
-var text = "this text changes"
+const {REACT_APP_LAST_API_KEY} = process.env;
 
 class SearchBar extends Component {
     constructor() {
         super();
         this.state = { 
             search: '', 
-            submit: '', 
             last_results: [], 
             spot_results: [], 
             last_top_chart: [],
@@ -88,21 +86,21 @@ class SearchBar extends Component {
         }
     }
     componentDidMount(){
-        var func = this;
         var timesRun = 0;
         this.getLastTopChart();
+        var innerThis = this;
         const message = 'Search for artists like...';
-        setTimeout(() => {
-            this.messageInterval = setInterval(function () {
+        this.initialMessageTimeout = setTimeout(() => {
+            this.initialMessageInterval = setInterval(() => {
                 if (!document.hidden) {
                     timesRun += 1;
                     if (timesRun > message.length) {
-                        clearInterval(func.messageInterval);
+                        clearInterval(innerThis.initialMessageInterval);
                     }
                     document.getElementById("search-box").setAttribute('placeholder', message.slice(0, timesRun));
                 }
             }, 2000 / message.length); 
-            setTimeout(() => {
+            this.nameChangeTimeout = setTimeout(() => {
                 this.inputInterval = setInterval(() => {
                     if (!document.hidden) {
                         let artist_index = this.state.chart_index;
@@ -114,15 +112,16 @@ class SearchBar extends Component {
                     }
                 }, 2500);
             }, 2000);
-        }, 1000);
-
-
+        }, 1500);
     }
 
     componentWillUnmount(){
+        clearTimeout(this.initialMessageTimeout);
+        clearTimeout(this.nameChangeTimeout);
+        clearTimeout(this.typingTimeout);
+        clearInterval(this.changeTextInterval);
+        clearInterval(this.initialMessageInterval);
         clearInterval(this.inputInterval);
-        clearInterval(this.messageInterval);
-        clearInterval(this.interval);
     }
 
     handleChange(e){
@@ -146,25 +145,29 @@ class SearchBar extends Component {
     }
 
     changeText = (artist_index) => {
-        var func = this;
+        var bar = this;
         var timesRun = 0;
         var nameLeng = this.state.last_top_chart[artist_index].name.length;
-        document.getElementById("search-box").setAttribute('placeholder', "");
-        setTimeout(()=> {
-            func.interval = setInterval(function () {
+        var searchBox = document.getElementById("search-box");
+        if (typeof searchBox != 'undefined' && searchBox != null) {
+            searchBox.setAttribute('placeholder', "");
+        }
+        this.typingTimeout = setTimeout(()=> {
+            this.changeTextInterval = setInterval(() => {
                 timesRun += 1;
                 if (timesRun > nameLeng) {
-                    clearInterval(func.interval);
+                    clearInterval(this.changeTextInterval);
                 }
-                var placeholderTxt = func.getChangedText(timesRun, artist_index);
-                document.getElementById("search-box").setAttribute('placeholder', placeholderTxt);
+                var placeholderTxt = bar.getChangedText(timesRun, artist_index);
+                if (typeof searchBox != 'undefined' && searchBox != null) {
+                    searchBox.setAttribute('placeholder', placeholderTxt);
+                }
             }, 1000 / nameLeng);
         },250);
     }
 
 
     render() {
-        var i = 0;
         const last_results = this.state.last_results
         const spot_results = this.state.spot_results
         const suggestions = [] 
@@ -176,7 +179,7 @@ class SearchBar extends Component {
                 if(typeof last_results[i] !== "undefined" && typeof spot_results[k] !== "undefined" && last_results[i].listeners > 500 && last_results[i].name.toUpperCase() === spot_results[k].name.toUpperCase()){
                     searchBox.classList.add("populated");
                     suggestionBox.classList.add("populated");
-                    const artist_name = last_results[i].name;
+                    const artist_name = spot_results[i].name;
                     const artist_link = "/search/" + artist_name.replace(/\s/g, '+');
                     suggestions.push(<Link to={{pathname:artist_link, state: spot_results[k]}} className="artist-link" key={artist_name}>{artist_name}</Link>);
                     break;

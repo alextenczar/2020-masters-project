@@ -12,10 +12,6 @@ function SpotViz(props) {
       history.push(d);
     }
 
-/*     window.onpopstate = function() {
-      window.location.reload(true);
-    }; */
-
     React.useEffect(() => {
       d3.selectAll("#viz > *").remove();
       d3.selectAll(".tooltip").remove();
@@ -50,7 +46,8 @@ function SpotViz(props) {
 
             var mouseover = function(d) {
               Tooltip
-                .style("opacity", 1)
+                .style('visibility', "visible")
+                .style('opacity', 1)
               d3.select(this)
                 .style("stroke", "white")
                 .style("opacity", 1)
@@ -101,6 +98,9 @@ function SpotViz(props) {
                       if(data[i].name != d.target.__data__.name && data[i].clicked == true) {
                         data[i].clicked = false;
                       }
+                      Tooltip
+                        .style('visibility', "visible")
+                        .style('opacity', 1)
                     }
                     d.target.__data__.clicked = true;
                   } else {
@@ -137,7 +137,7 @@ function SpotViz(props) {
               
               // charge is dependent on size of the bubble, so bigger towards the middle
               function charge(d) {
-                return -Math.pow(distanceScale(d.popularity/100), 2.0) * 0.05
+                return -Math.pow(distanceScale(d.popularity/100), 2.0) * 0.3
               }
 
             var simulation = d3.forceSimulation()
@@ -154,10 +154,7 @@ function SpotViz(props) {
             .duration(2000)
             .attr('r', function(d) {return distanceScale(d.popularity / 100); });
 
-          
-
-            if(data !== null)
-            {
+            if(data !== null) {
               simulation.nodes(data)
             }
             
@@ -184,16 +181,16 @@ function SpotViz(props) {
 
             zoom_handler.on("end", function() {
               svg.style("cursor", "grab")
-              Tooltip
-                .style('visibility', "visible")
-                .style('opacity', 1)
             })
 
-            function zoom_actions(event){
+
+            function zoom_actions(event) {
+              for (var i = 0; i < data.length; i++) {
+                data[i].clicked = false;
+              }
               g.attr("transform", event.transform)
             }
-
-
+            
             var process = 1;
             function ticked() {
               if(process === 1) {
@@ -212,15 +209,13 @@ function SpotViz(props) {
         [spotify_data]
       );
 
-    
-
         return (
           <div id="d3">
               <svg
                 id="viz"
                 ref={ref}
                 style={{
-                  marginTop: "25px", 
+                  marginTop: "0px", 
                   marginRight: "0px",
                   marginLeft: "0px",
                   cursor: "grab",
@@ -228,9 +223,7 @@ function SpotViz(props) {
                 viewBox="0 0 1000 1000"
                 preserveAspectRatio="xMidYMid meet"
               >
-                <defs>
-                  
-                </defs>
+                <defs></defs>
               </svg>
           </div>
           );

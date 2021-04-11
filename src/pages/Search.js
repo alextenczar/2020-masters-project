@@ -8,8 +8,8 @@ import {ReactComponent as Back} from '../static/icons/back.svg';
 function Search(props) {
     const {REACT_APP_LAST_API_KEY, REACT_APP_SPOTIFY_CLIENT, REACT_APP_SPOTIFY_SECRET} = process.env
     const { name } = useParams();
-    const [lastArtistInfo, setLastArtistInfo] = useState({});
-    const [spotArtistInfo, setSpotArtistInfo] = useState({});
+    const [lastArtistInfo, setLastArtistInfo] = useState(undefined);
+    const [spotArtistInfo, setSpotArtistInfo] = useState(undefined);
     const name_fixed = name.replace(/\+/g, ' ');
     const last_url = 'https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=';
     const spot_url = 'https://api.spotify.com/v1/search?q=';
@@ -36,7 +36,7 @@ function Search(props) {
                 setSpotArtistInfo(data.artists.items[0]);
             }
             if(data.artists.items.length == 0 || typeof data.artists == "undefined") {
-                history.push('/404')
+                history.replace('/404')
             }
         })
     }, []);

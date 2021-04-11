@@ -1,6 +1,8 @@
 @import '../colors';
 .lightbox {
-    overflow-y: scroll !important;
+    @media screen and (max-height: 800px) {
+        overflow-y: auto !important;
+    }
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     margin:auto;

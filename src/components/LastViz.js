@@ -2,17 +2,14 @@ import React, { Component } from 'react';
 import * as d3 from 'd3';
 import {useD3} from '../hooks/UseD3.js';
 import { Link, Redirect, useHistory, useLocation} from 'react-router-dom';
-import {scaleSqrt} from 'd3';
 import '../styles/pages/viz.scss';
 
 function LastViz(props) {
-    console.log(navigator.maxTouchPoints)
     const spotify_data = props.spotResults;
     const last_data = props.lastResults;
     const lowest = props.lowest;
     const history = useHistory();
     const location = useLocation();
-    const currentUrl = window.location.href;
     const redirect = d => {
       history.push(d);
     }
@@ -34,26 +31,8 @@ function LastViz(props) {
               const margin = { top: 20, right: 30, bottom: 30, left: 40 };
               const center = { x: width/2, y: height/2 };
               
-            var distanceScale = d3.scaleSqrt().domain([lowest, 1]).range([30, 70])
-            var defs = svg.append("defs");
-
-            function charge(d) {
-              return -Math.pow(distanceScale(d.match), 2.0) * .3;
-            }
-          
-
-          var simulation = d3.forceSimulation(data)
-          .force("x", d3.forceX(width / 2).strength(.3).x(center.x))
-          .force("y", d3.forceY(height / 2).strength(.3).y(center.y))
-          .force('charge', d3.forceManyBody().strength(charge))
-          .force("collide", d3.forceCollide(function(d){
-              return distanceScale(d.match * 1.1);
-            }))
-            .on('tick', ticked)
-            //.stop(); //used for static viz
-
-
-          //for (var i = 0; i < 300; ++i) {simulation.tick();} // for static viz
+          var distanceScale = d3.scaleSqrt().domain([lowest, 1]).range([30, 70])
+          var defs = svg.append("defs");
 
           var Tooltip = d3.select("#d3")
             .append("div")
@@ -69,7 +48,8 @@ function LastViz(props) {
 
           var mouseover = function(d) {
             Tooltip
-              .style("opacity", 1)
+              .style('visibility', "visible")
+              .style('opacity', 1)
             d3.select(this)
               .style("stroke", "white")
               .style("opacity", 1)
@@ -91,7 +71,6 @@ function LastViz(props) {
 
           var g = svg.append("g")
             .attr("class", "everything")
-            .style("background-color", "white")
 
           var circles = g.selectAll(".artist")
             .data(data)
@@ -121,25 +100,18 @@ function LastViz(props) {
                     if(data[i].name != d.target.__data__.name && data[i].clicked == true) {
                       data[i].clicked = false;
                     }
+                    Tooltip
+                      .style('visibility', "visible")
+                      .style('opacity', 1)
                   }
                   d.target.__data__.clicked = true;
                 } else {
                   redirect(artist_link);
                 }
               } else {
-                  redirect(artist_link);
+                redirect(artist_link);
               }
             })
-          
-          circles.transition()
-            .delay(500)
-            .duration(2000)
-            .attr('r', function(d) {return distanceScale(d.match); });
-
-            if(data !== null)
-            {
-              simulation.nodes(data);
-            }
 
             defs.selectAll(".artist-pattern")
               .data(spotify_data)
@@ -163,6 +135,28 @@ function LastViz(props) {
                   return imageUrl.url;
                 }
               })
+
+            function charge(d) {
+              return -Math.pow(distanceScale(d.match), 2.0) * 0.3;
+            }
+
+            var simulation = d3.forceSimulation(data)
+              .force("x", d3.forceX(width / 2).strength(.3).x(center.x))
+              .force("y", d3.forceY(height / 2).strength(.3).y(center.y))
+              .force('charge', d3.forceManyBody().strength(charge))
+              .force("collide", d3.forceCollide(function (d) {
+                return distanceScale(d.match * 1.1);
+              }))
+              .on('tick', ticked)
+
+            circles.transition()
+              .delay(500)
+              .duration(2000)
+              .attr('r', function (d) { return distanceScale(d.match); });
+
+            if (data !== null) {
+              simulation.nodes(data);
+            }
             
             function drawChart() {
               var currentWidth = parseInt(d3.select('#d3').style('width'), 10)
@@ -187,12 +181,12 @@ function LastViz(props) {
 
             zoom_handler.on("end", function() {
               svg.style("cursor", "grab")
-              Tooltip
-                .style('visibility', "visible")
-                .style('opacity', 1)
             })
 
             function zoom_actions(event){
+              for (var i = 0; i < data.length; i++) {
+                data[i].clicked = false;
+              }
               g.attr("transform", event.transform)
             }
 
@@ -210,7 +204,6 @@ function LastViz(props) {
             window.onpopstate = function() {
               window.removeEventListener('resize', drawChart);
             }
-            
         },
         [last_data]
       );
