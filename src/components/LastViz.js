@@ -115,7 +115,7 @@ function LastViz(props) {
               || navigator.userAgent.match(/BlackBerry/i)
               || navigator.userAgent.match(/Windows Phone/i)
               || navigator.userAgent.match(/Windows Phone/i)
-              ) {
+              || navigator.maxTouchPoints > 0) {
                 if(d.target.__data__.clicked != true) {
                   for(var i = 0; i < data.length; i++) {
                     if(data[i].name != d.target.__data__.name && data[i].clicked == true) {
