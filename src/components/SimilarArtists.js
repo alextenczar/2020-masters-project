@@ -230,26 +230,19 @@ class SimilarArtists extends Component {
         });
     }
 
-    audioPause(audio){
-        var trackContainer = document.getElementById(audio + "-container")
-        trackContainer.classList.remove('audio-playing');
-    }
-    audioPlay(audio) {
-        var trackContainer = document.getElementById(audio + "-container")
-        trackContainer.classList.add('audio-playing');
-    }
-    audioEnd(audio) {
+    previewAudio(audio){
         var track = document.getElementById(audio);
         var trackContainer = document.getElementById(audio + "-container")
-        track.currentTime = 0;
-        trackContainer.classList.remove('audio-playing');
-    }
-
-    previewAudio(audio){
-        var track = document.getElementById(audio); 
-        track.addEventListener("pause", this.audioPause(audio));
-        track.addEventListener("play", this.audioPlay(audio));
-        track.addEventListener("ended", this.audioEnd(audio));
+        track.addEventListener("pause", function () {
+            trackContainer.classList.remove('audio-playing');
+        });
+        track.addEventListener("play", function () {
+            trackContainer.classList.add('audio-playing');
+        });
+        track.addEventListener("ended", function () {
+            track.currentTime = 0;
+            trackContainer.classList.remove('audio-playing');
+        });
         if(track !== null && track.readyState !== 0){
             if(track.paused == true){ this.pauseAllAudio(); track.volume = .75; track.play(); }
             else { track.pause(); }
