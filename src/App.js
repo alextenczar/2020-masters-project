@@ -9,12 +9,12 @@ class App extends Component{
   authSpot(){
     var token = getSpotifyToken();
     token.then((response) => {
-      const expiryTime = new Date().getTime() + 5000;
       let params = {
         access_token: response.access_token,
         token_type: response.token_type,
         expires_in: response.expires_in
       };
+      const expiryTime = new Date().getTime() + (response.expires_in * 1000);
       localStorage.setItem('expiry_time', expiryTime);
       localStorage.setItem('params', JSON.stringify(params));
       this.forceUpdate();

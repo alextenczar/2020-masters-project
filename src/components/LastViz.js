@@ -152,7 +152,12 @@ function LastViz(props) {
             circles.transition()
               .delay(500)
               .duration(2000)
-              .attr('r', function (d) { return distanceScale(d.match); });
+              .attr('r', function (d) { return distanceScale(d.match*1.1); })
+
+            circles.transition()
+              .delay(2500)
+              .duration(750)
+              .attr('r', function (d) {return distanceScale(d.match); })
 
             if (data !== null) {
               simulation.nodes(data);

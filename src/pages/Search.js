@@ -15,6 +15,7 @@ function Search(props) {
     const spot_url = 'https://api.spotify.com/v1/search?q=';
     const spot_token = JSON.parse(localStorage.getItem('params'));
     let history = useHistory();
+    let results;
 
     useEffect(() => {
         if(spot_token === null) {
@@ -42,15 +43,14 @@ function Search(props) {
     }, []);
 
     if (typeof spotArtistInfo !== "undefined") {
-        return (
-            <>
-                <a id="back-link" href="/"><Back id="back-button"/></a>
-                <SimilarArtists artist={name} type={props.type} token={props.token}></SimilarArtists>
-            </>
-        )
+        results = <>
+            <SimilarArtists artist={name} type={props.type} token={props.token}></SimilarArtists>
+        </>
     }
     return (
         <>
+            <a id="back-link" href="/"><Back id="back-button" /></a>
+            {results}
         </>
     )
 };

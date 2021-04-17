@@ -2,10 +2,6 @@
 
 #home-search{
     animation: fadein 1s;
-    //width: 400px;
-    @media screen and (max-width: 400px) {
-        //width: 300px;
-    }
     input {
         background-image: url(../../static/icons/search.svg);
         background-repeat: no-repeat;
@@ -14,7 +10,8 @@
         background-size: 7%;
         background-color: white;
         text-indent: 1.25em;
-        width: 95%;
+        margin: 0;
+        width:400px;
         @media screen and (max-width: 770px) {
             font-size: 1.25em;
             width: 280px;
@@ -49,13 +46,8 @@ input + .suggestions-container{
 }
 input + #suggestion-box{
     display: none;
-    width: 99.25%;
-    @media screen and (max-width: 770px) {
-        width: 100%;
-    }
 }
 input + #suggestion-box.populated{
-    
     display: block;
 }
 

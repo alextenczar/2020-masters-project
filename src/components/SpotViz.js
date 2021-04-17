@@ -150,9 +150,14 @@ function SpotViz(props) {
               .on('tick', ticked)
 
             circles.transition()
-            .delay(500)
-            .duration(2000)
-            .attr('r', function(d) {return distanceScale(d.popularity / 100); });
+              .delay(500)
+              .duration(2000)
+              .attr('r', function(d) {return distanceScale((d.popularity / 100) * 1.2); });
+
+            circles.transition()
+              .delay(2500)
+              .duration(750)
+              .attr('r', function (d) { return distanceScale(d.popularity / 100); });
 
             if(data !== null) {
               simulation.nodes(data)

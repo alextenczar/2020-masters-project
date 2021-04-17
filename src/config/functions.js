@@ -2,7 +2,7 @@ import axios from 'axios';
 const {REACT_APP_SPOTIFY_CLIENT, REACT_APP_SPOTIFY_SECRET} = process.env
 
 export const getSpotifyToken = () => {
-  const test = axios({
+  const request = axios({
     url: "https://accounts.spotify.com/api/token",
     method: "POST",
     headers: {
@@ -12,7 +12,8 @@ export const getSpotifyToken = () => {
     data: "grant_type=client_credentials",
   })
   .then(({ data }) => {
-      return data
+    console.log("test");
+    return data
   })
-  return test
+  return request;
 };
