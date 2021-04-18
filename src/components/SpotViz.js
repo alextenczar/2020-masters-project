@@ -127,8 +127,7 @@ function SpotViz(props) {
               .attr("width", 1)
               .attr("preserveAspectRatio", "xMidYMid slice")
               .attr("object-fit", "cover")
-              .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
-              .attr("xlink:href", function(d){
+              .attr("href", function(d){
                 var imageUrl = d.images[1]
                 if(imageUrl != null){
                   return imageUrl.url;

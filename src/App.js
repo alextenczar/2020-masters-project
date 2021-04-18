@@ -4,6 +4,7 @@ import Search from './pages/Search.js';
 import Home from './pages/Home.js';
 import { getSpotifyToken } from './config/functions';
 import NotFound from './pages/NotFound.js';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 class App extends Component{
   authSpot(){
@@ -46,7 +47,31 @@ class App extends Component{
     }
     return (
       <div className="wrapper">
-        <header className="app-header"></header>
+        <Helmet>
+          <title>BandViz</title>
+          <link rel="canonical" href="https://www.bandviz.com/" />
+          <link
+            rel="apple-touch-icon"
+            sizes="180x180"
+            href="/favicon/apple-touch-icon.png"
+          />
+          <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="/favicon/favicon-32x32.png"
+          />
+          <link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="/favicon/favicon-16x16.png"
+          />
+          <link rel="manifest" href="/favicon/site.webmanifest" />
+          <link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" color="#5bbad5" />
+          <meta name="msapplication-TileColor" content="#da532c" />
+          <meta name="theme-color" content="#121212" />
+        </Helmet>
         <Switch>
             {home}
             {search}

@@ -12,7 +12,6 @@ export const getSpotifyToken = () => {
     data: "grant_type=client_credentials",
   })
   .then(({ data }) => {
-    console.log("test");
     return data
   })
   return request;
