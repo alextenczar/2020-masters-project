@@ -10,8 +10,9 @@ function LastViz(props) {
     const lowest = props.lowest;
     const history = useHistory();
     const location = useLocation();
-    const redirect = d => {
-      history.push(d);
+    const redirect = (d,e) => {
+      history.push({pathname: d,
+        state: { spotifyObject: e}});
     }
 
     React.useEffect(() => {
@@ -106,10 +107,10 @@ function LastViz(props) {
                   }
                   d.target.__data__.clicked = true;
                 } else {
-                  redirect(artist_link);
+                  redirect(artist_link, artist.spotify);
                 }
               } else {
-                redirect(artist_link);
+                redirect(artist_link, artist.spotify);
               }
             })
 

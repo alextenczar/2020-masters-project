@@ -51,44 +51,57 @@ class SimilarArtists extends Component {
 
     async getSpotSearch(){ //used for querying search artist and creating artist object
         this.setState({route_changed: 0});
-        axios.get(`${spot_search_url}${this.state.artist}&type=artist&limit=10`, {
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                Authorization: this.props.type + " " + this.props.token,
+        if(typeof this.props.spotifyObject !== "undefined") {
+            if (this.props.spotifyObject.images.length == 0) {
+                this.props.spotifyObject.images.push({ url: '/images/default-avatar.png' });
+                this.props.spotifyObject.images.push({ url: '/images/default-avatar.png' });
+                this.props.spotifyObject.images.push({ url: '/images/default-avatar.png' });
             }
-        })
-        .then(({ data }) => {
-            if(typeof data.artists !== "undefined" && this.state.artist !== "") {
-                let found = false;
-                let filteredSpotSingleArtist;
-                const name_fixed = this.state.artist.replace(/\+/g, ' ');
-                for(var k = 0; k < data.artists.items.length; k++) {
-                    if(data.artists.items[k].name.toUpperCase().localeCompare(name_fixed.toUpperCase()) == 0) {
-                        found = true;
-                        filteredSpotSingleArtist = data.artists.items[k];
-                        if(filteredSpotSingleArtist.images.length == 0) {
-                            filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
-                            filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
-                            filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
+            this.setState({ spotArtistObject: this.props.spotifyObject }, () => { this.getLastSearch(); this.getSpotSimilar(); this.getSpotTopTracks(); });
+            this.setState({ route_changed: 1 });
+        } else {
+            axios.get(`${spot_search_url}${this.state.artist}&type=artist&limit=10`, {
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    Authorization: this.props.type + " " + this.props.token,
+                }
+            })
+            .then(({ data }) => {
+                if(typeof data.artists !== "undefined" && this.state.artist !== "") {
+                    let found = false;
+                    let filteredSpotSingleArtist;
+                    const name_fixed = this.state.artist.replace(/\+/g, ' ');
+                    for(var k = 0; k < data.artists.items.length; k++) {
+                        if(data.artists.items[k].name.toUpperCase().localeCompare(name_fixed.toUpperCase()) == 0) {
+                            found = true;
+                            filteredSpotSingleArtist = data.artists.items[k];
+                            if(filteredSpotSingleArtist.images.length == 0) {
+                                filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
+                                filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
+                                filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
+                            }
+                            this.setState({spotArtistObject: filteredSpotSingleArtist}, () => { this.getLastSearch(); this.getSpotSimilar(); this.getSpotTopTracks();});
+                            this.setState({route_changed: 1});
+                            break;
                         }
-                        this.setState({spotArtistObject: filteredSpotSingleArtist}, () => { this.getLastSearch(); this.getSpotSimilar(); this.getSpotTopTracks();});
-                        this.setState({route_changed: 1});
-                        break;
+                    }
+                    if(found == false) { //return first result if no perfect match found
+                        filteredSpotSingleArtist = data.artists.items[0];
+                        if (filteredSpotSingleArtist.images.length == 0) {
+                            filteredSpotSingleArtist.images.push({ url: '/images/default-avatar.png' });
+                            filteredSpotSingleArtist.images.push({ url: '/images/default-avatar.png' });
+                            filteredSpotSingleArtist.images.push({ url: '/images/default-avatar.png' });
+                        }
+                        this.setState({ spotArtistObject: filteredSpotSingleArtist }, () => { this.getLastSearch(); this.getSpotSimilar(); this.getSpotTopTracks(); });
+                        this.setState({ route_changed: 1 });
                     }
                 }
-                if(found == false) { //return first result if no perfect match found
-                    filteredSpotSingleArtist = data.artists.items[0];
-                    if (filteredSpotSingleArtist.images.length == 0) {
-                        filteredSpotSingleArtist.images.push({ url: '/images/default-avatar.png' });
-                        filteredSpotSingleArtist.images.push({ url: '/images/default-avatar.png' });
-                        filteredSpotSingleArtist.images.push({ url: '/images/default-avatar.png' });
-                    }
-                    this.setState({ spotArtistObject: filteredSpotSingleArtist }, () => { this.getLastSearch(); this.getSpotSimilar(); this.getSpotTopTracks(); });
-                    this.setState({ route_changed: 1 });
-                }
-            }
-        })
+            })
+        }
+        setTimeout(() => {
+            this.setState({route_changed: 0});
+        }, 2250);
     }
 
     async getSpotTopTracks(){
@@ -149,7 +162,7 @@ class SimilarArtists extends Component {
             else if(initialLastArtistArray.length > 0) { //if last.fm returned any similar artists
                 var z = 0;
                 var length = initialLastArtistArray.length;
-                if(length > 55) { length = 55}
+                if(length > 45) { length = 45}
                 for(var i = 0; i < length; i++) {
                     const similarQuery = initialLastArtistArray[i];
                     promises.push(axios.get(`${spot_search_url}${similarQuery.name}&type=artist&limit=20`, {
@@ -168,6 +181,7 @@ class SimilarArtists extends Component {
                                     spotifySearchResult.images.push({ url: '/images/default-avatar.png' });
                                     spotifySearchResult.images.push({ url: '/images/default-avatar.png' });
                                 }
+                                similarQuery.spotify = spotifySearchResult;
                                 filteredLastArtistArray.push(similarQuery);
                                 filteredSpotArtistArray.push(spotifySearchResult);
                                 z++;
@@ -180,8 +194,8 @@ class SimilarArtists extends Component {
                 }
                 Promise.all(promises).then(() => {  //set the states once all the responses are complete
                     var arrayLength = filteredLastArtistArray.length;
-                    if(filteredLastArtistArray.length > 51) {
-                        arrayLength = 51;
+                    if(filteredLastArtistArray.length > 40) {
+                        arrayLength = 40;
                     }
                     this.setState({spotFinalArtists: filteredSpotArtistArray.slice(0,arrayLength)})
                     this.setState({lastFinalArtists: filteredLastArtistArray.slice(0,arrayLength)})
@@ -258,14 +272,11 @@ class SimilarArtists extends Component {
         let genreContainer;
         let viz;
         let sourceArtist;
-        let sourceArtistImage;
+        let sourceArtistImage  = <></>
         let title = <Helmet>
                         <title>BandViz</title>
                     </Helmet>
 
-        if(this.state.route_changed == 1) {sourceArtistImage = <div id="source-artist-image" style={{backgroundImage: `url(${sao.images[0].url})`}}></div>
-        }else{sourceArtist = <></>}
-        
         if(typeof sao !== "undefined" && typeof sao.images !== "undefined") {
             var genreLength = sao.genres.length;
             let genreTitle = "Genres"
@@ -285,6 +296,10 @@ class SimilarArtists extends Component {
             title = <Helmet>
                         <title>{sao.name} | BandViz</title>
                     </Helmet>
+
+            if (this.state.route_changed == 1) {
+                sourceArtistImage = <div id="source-artist-image" style={{ backgroundImage: `url(${this.props.spotifyObject.images[0].url})` }}></div>
+            } else { sourceArtistImage = <></> }
 
             if(typeof toptracks !== "undefined") {
                 var track_count = 0;
