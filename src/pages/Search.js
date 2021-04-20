@@ -18,52 +18,29 @@ function Search(props) {
     let results;
 
     useEffect(() => {
-        setRouteChanged(false);
         if (spot_token === null) {
             setTimeout(() => { }, 100);
         }
-        if(typeof location.state !== "undefined") {
-            if (typeof location.state.spotifyObject == "undefined") {
-                axios.get(`${spot_url}${name}&type=artist&limit=1`, {
-                    headers: {
-                        "Accept": "application/json",
-                        "Content-Type": "application/json",
-                        Authorization: props.type + " " + props.token,
-                    }
-                })
-                .then(({ data }) => {
-                    if (typeof data.artists !== "undefined" && name !== "") {
-                        setSpotArtistInfo(data.artists.items[0]);
-                    }
-                    if (data.artists.items.length == 0 || typeof data.artists == "undefined") {
-                        history.replace('/404')
-                    }
-                })
+        axios.get(`${spot_url}${name}&type=artist&limit=1`, {
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                Authorization: props.type + " " + props.token,
             }
-            else { setSpotArtistInfo(location.state.spotifyObject); }
-        } else {
-            axios.get(`${spot_url}${name}&type=artist&limit=1`, {
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    Authorization: props.type + " " + props.token,
-                }
-            })
-                .then(({ data }) => {
-                    if (typeof data.artists !== "undefined" && name !== "") {
-                        setSpotArtistInfo(data.artists.items[0]);
-                    }
-                    if (data.artists.items.length == 0 || typeof data.artists == "undefined") {
-                        history.replace('/404')
-                    }
-                })
-        }
-        setRouteChanged(true);
-    }, [location]);
+        })
+        .then(({ data }) => {
+            if (typeof data.artists !== "undefined" && name !== "") {
+                setSpotArtistInfo(data.artists.items[0]);
+            }
+            if (data.artists.items.length == 0 || typeof data.artists == "undefined") {
+                history.replace('/404')
+            }
+        })
+    }, []);
 
-    if (typeof spotArtistInfo !== "undefined" && route_changed == true) {
+    if (typeof spotArtistInfo !== "undefined") {
         results = <>
-            <SimilarArtists artist={name} spotifyObject = {spotArtistInfo} type={props.type} token={props.token}></SimilarArtists>
+            <SimilarArtists artist={name} type={props.type} token={props.token}></SimilarArtists>
         </>
     }
     return (

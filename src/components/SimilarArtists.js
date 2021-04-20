@@ -51,57 +51,45 @@ class SimilarArtists extends Component {
 
     async getSpotSearch(){ //used for querying search artist and creating artist object
         this.setState({route_changed: 0});
-        if(typeof this.props.spotifyObject !== "undefined") {
-            if (this.props.spotifyObject.images.length == 0) {
-                this.props.spotifyObject.images.push({ url: '/images/default-avatar.png' });
-                this.props.spotifyObject.images.push({ url: '/images/default-avatar.png' });
-                this.props.spotifyObject.images.push({ url: '/images/default-avatar.png' });
+        axios.get(`${spot_search_url}${this.state.artist}&type=artist&limit=10`, {
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                Authorization: this.props.type + " " + this.props.token,
             }
-            this.setState({ spotArtistObject: this.props.spotifyObject }, () => { this.getLastSearch(); this.getSpotSimilar(); this.getSpotTopTracks(); });
-            this.setState({ route_changed: 1 });
-        } else {
-            axios.get(`${spot_search_url}${this.state.artist}&type=artist&limit=10`, {
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    Authorization: this.props.type + " " + this.props.token,
-                }
-            })
-            .then(({ data }) => {
-                if(typeof data.artists !== "undefined" && this.state.artist !== "") {
-                    let found = false;
-                    let filteredSpotSingleArtist;
-                    const name_fixed = this.state.artist.replace(/\+/g, ' ');
-                    for(var k = 0; k < data.artists.items.length; k++) {
-                        if(data.artists.items[k].name.toUpperCase().localeCompare(name_fixed.toUpperCase()) == 0) {
-                            found = true;
-                            filteredSpotSingleArtist = data.artists.items[k];
-                            if(filteredSpotSingleArtist.images.length == 0) {
-                                filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
-                                filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
-                                filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
-                            }
-                            this.setState({spotArtistObject: filteredSpotSingleArtist}, () => { this.getLastSearch(); this.getSpotSimilar(); this.getSpotTopTracks();});
-                            this.setState({route_changed: 1});
-                            break;
+        })
+        .then(({ data }) => {
+            if(typeof data.artists !== "undefined" && this.state.artist !== "") {
+                let found = false;
+                let filteredSpotSingleArtist;
+                const name_fixed = this.state.artist.replace(/\+/g, ' ');
+                for(var k = 0; k < data.artists.items.length; k++) {
+                    if(data.artists.items[k].name.toUpperCase().localeCompare(name_fixed.toUpperCase()) == 0) {
+                        found = true;
+                        filteredSpotSingleArtist = data.artists.items[k];
+                        if(filteredSpotSingleArtist.images.length == 0) {
+                            filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
+                            filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
+                            filteredSpotSingleArtist.images.push({url : '/images/default-avatar.png'});
                         }
-                    }
-                    if(found == false) { //return first result if no perfect match found
-                        filteredSpotSingleArtist = data.artists.items[0];
-                        if (filteredSpotSingleArtist.images.length == 0) {
-                            filteredSpotSingleArtist.images.push({ url: '/images/default-avatar.png' });
-                            filteredSpotSingleArtist.images.push({ url: '/images/default-avatar.png' });
-                            filteredSpotSingleArtist.images.push({ url: '/images/default-avatar.png' });
-                        }
-                        this.setState({ spotArtistObject: filteredSpotSingleArtist }, () => { this.getLastSearch(); this.getSpotSimilar(); this.getSpotTopTracks(); });
-                        this.setState({ route_changed: 1 });
+                        this.setState({spotArtistObject: filteredSpotSingleArtist}, () => { this.getLastSearch(); this.getSpotSimilar(); this.getSpotTopTracks();});
+                        this.setState({route_changed: 1});
+                        break;
                     }
                 }
-            })
-        }
-        setTimeout(() => {
-            this.setState({route_changed: 0});
-        }, 2250);
+                if(found == false) { //return first result if no perfect match found
+                    filteredSpotSingleArtist = data.artists.items[0];
+                    if (filteredSpotSingleArtist.images.length == 0) {
+                        filteredSpotSingleArtist.images.push({ url: '/images/default-avatar.png' });
+                        filteredSpotSingleArtist.images.push({ url: '/images/default-avatar.png' });
+                        filteredSpotSingleArtist.images.push({ url: '/images/default-avatar.png' });
+                    }
+                    this.setState({ spotArtistObject: filteredSpotSingleArtist }, () => { this.getLastSearch(); this.getSpotSimilar(); this.getSpotTopTracks(); });
+                    this.setState({ route_changed: 1 });
+                }
+            }
+        })
+        this.setState({route_changed: 0});
     }
 
     async getSpotTopTracks(){
@@ -298,7 +286,7 @@ class SimilarArtists extends Component {
                     </Helmet>
 
             if (this.state.route_changed == 1) {
-                sourceArtistImage = <div id="source-artist-image" style={{ backgroundImage: `url(${this.props.spotifyObject.images[0].url})` }}></div>
+                sourceArtistImage = <div id="source-artist-image" style={{ backgroundImage: `url(${sao.images[0].url})` }}></div>
             } else { sourceArtistImage = <></> }
 
             if(typeof toptracks !== "undefined") {
