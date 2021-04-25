@@ -44,6 +44,7 @@ class App extends Component{
       else {
         home = <Route exact path='/' render={(props) => <Home type={spot_token.token_type} token={spot_token.access_token}/>} />;
         search = <Route path='/search/:name' render={(props) => <Search type={spot_token.token_type} token={spot_token.access_token}/>}/>;
+        notFound = <Route path='*' render={(props) => <NotFound />} />;
       }
     }
     return (
@@ -77,7 +78,7 @@ class App extends Component{
             {home}
             {search}
             <Route path='/help' render={(props) => <Help />} />
-            <Route path='*' render={(props) => <NotFound />} />
+            {notFound}
         </Switch>
       </div>
     );

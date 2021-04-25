@@ -8,7 +8,10 @@
     b {
         font-family: 'Montserrat-Bold'
     }
-    padding-bottom: 1em;
+    @media screen and (max-width: 500px) {
+        padding-bottom: 5em;
+    }
+    padding-bottom: 2em;
     padding-top: 1em;
     text-align: center;
     margin: auto;

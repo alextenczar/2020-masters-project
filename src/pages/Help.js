@@ -77,7 +77,7 @@ class Help extends Component {
                             </filter>
                             <circle id="bubble" cx="50" cy="50" r="40" fill="white"/>
                         </svg>
-                        <h5>Hover Me!</h5>
+                        <h5>Hover/Tap Me!</h5>
                         <div className="explanation">
                             <p>
                             <h3>Desktop:</h3>
@@ -90,7 +90,7 @@ class Help extends Component {
                         </div>
                         <div id="tooltip">Khalid <br/> Similarity: 80%</div>
                     </div>
-                    <h4 id="enjoy">That's it, enjoy! - Alex</h4>
+                    <h4 id="enjoy">That's it, enjoy finding new artists! - Alex</h4>
                 </div>
             </div>
         );
