@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import SearchBar from '../components/SearchBar.js';
 import '../styles/pages/home.scss';
 import {ReactComponent as Logo} from '../static/icons/bandviz-logo.svg';
+import {ReactComponent as Help} from '../static/icons/help.svg';
+import { Link} from 'react-router-dom';
     
 
 class Home extends Component {
@@ -16,6 +18,7 @@ class Home extends Component {
         }
         return (
             <div id="home">
+                <Link className="help-link" to="/help"><Help id="help-button"/></Link>
                 <div className="searchbar-container">
                     <Logo></Logo>
                     <h1>BandViz</h1>
