@@ -46,7 +46,7 @@ class Help extends Component {
                 <Link id="back-link" to="/"><Back id="back-button" /></Link>
                 <div className="help-wrapper">
                     <h1>Help</h1>
-                    <h2>1. Manipulating the Viz:</h2>
+                    <h2>1. Manipulating The Viz:</h2>
                     <div className="logo-container">
                         <Logo id="logo"></Logo>
                     </div>
@@ -60,7 +60,7 @@ class Help extends Component {
                         </p>
                     </div>
                     <div className="artist-demo">
-                        <h2>2. Getting to know the artist:</h2>
+                        <h2>2. Getting To Know The Artist:</h2>
                         <div className="name-demo">Khalid</div>
                         <div className="explanation">
                             <p>
