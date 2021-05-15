@@ -34,9 +34,12 @@ This web app can be built locally by following these steps:
  - Type in the search bar for an artist whom you want to visualize their similar artists.
 	 - Either click an auto completed result in the drop-down menu or press enter.
  - Once the visualization is rendered: 
-	 - Hover over the artist bubbles to display their name and similarity value.
+     - All similar artists are rendered in the center of the screen as bubbles.
+     - The bigger the artist's bubble, the more similar they are. 
+	 - Hover over an artist's bubble to display their name and similarity value.
 	 - Scroll or pinch to zoom in order to render the visualization bigger or smaller.
 	 - Drag the visualization to position a specific bubble in view.
 	 - Click your searched artist's name at the top of the page to listen to preview tracks and see their genres.
+     - Click a similar artist's bubble to search for their similar artists.
 
-![Imgur Image](https://i.imgur.com/lQcefW8.gif)
+![Imgur Image](https://i.imgur.com/OplSHdch.gif)
