@@ -38,3 +38,5 @@ This web app can be built locally by following these steps:
 	 - Scroll or pinch to zoom in order to render the visualization bigger or smaller.
 	 - Drag the visualization to position a specific bubble in view.
 	 - Click your searched artist's name at the top of the page to listen to preview tracks and see their genres.
+
+![Imgur Image](https://i.imgur.com/lQcefW8.gif)
