@@ -42,4 +42,4 @@ This web app can be built locally by following these steps:
 	 - Click your searched artist's name at the top of the page to listen to preview tracks and see their genres.
      - Click a similar artist's bubble to search for their similar artists.
 
-![Imgur Image](https://i.imgur.com/OplSHdc.gif)
+![Imgur Image](https://i.imgur.com/lQcefW8.gif)
