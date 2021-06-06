@@ -8,9 +8,11 @@ function SpotViz(props) {
     const spotify_data = props.spotResults;
     const history = useHistory();
     const location = useLocation();
-    const redirect = d => {
-      history.push(d);
-    }
+  const redirect = (d, e) => {
+    history.push({
+      pathname: d,
+      state: { spotifyObject: e }});
+  }
 
     React.useEffect(() => {
       d3.selectAll("#viz > *").remove();
@@ -104,10 +106,10 @@ function SpotViz(props) {
                     }
                     d.target.__data__.clicked = true;
                   } else {
-                    redirect(artist_link);
+                    redirect(artist_link,artist);
                   }
                 } else {
-                  redirect(artist_link);
+                  redirect(artist_link,artist);
                 }
               })
               

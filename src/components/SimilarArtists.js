@@ -89,6 +89,7 @@ class SimilarArtists extends Component {
                 }
             }
         })
+        this.setState({route_changed: 0});
     }
 
     async getSpotTopTracks(){
@@ -149,7 +150,7 @@ class SimilarArtists extends Component {
             else if(initialLastArtistArray.length > 0) { //if last.fm returned any similar artists
                 var z = 0;
                 var length = initialLastArtistArray.length;
-                if(length > 55) { length = 55}
+                if(length > 45) { length = 45}
                 for(var i = 0; i < length; i++) {
                     const similarQuery = initialLastArtistArray[i];
                     promises.push(axios.get(`${spot_search_url}${similarQuery.name}&type=artist&limit=20`, {
@@ -168,6 +169,7 @@ class SimilarArtists extends Component {
                                     spotifySearchResult.images.push({ url: '/images/default-avatar.png' });
                                     spotifySearchResult.images.push({ url: '/images/default-avatar.png' });
                                 }
+                                similarQuery.spotify = spotifySearchResult;
                                 filteredLastArtistArray.push(similarQuery);
                                 filteredSpotArtistArray.push(spotifySearchResult);
                                 z++;
@@ -180,8 +182,8 @@ class SimilarArtists extends Component {
                 }
                 Promise.all(promises).then(() => {  //set the states once all the responses are complete
                     var arrayLength = filteredLastArtistArray.length;
-                    if(filteredLastArtistArray.length > 51) {
-                        arrayLength = 51;
+                    if(filteredLastArtistArray.length > 40) {
+                        arrayLength = 40;
                     }
                     this.setState({spotFinalArtists: filteredSpotArtistArray.slice(0,arrayLength)})
                     this.setState({lastFinalArtists: filteredLastArtistArray.slice(0,arrayLength)})
@@ -258,14 +260,11 @@ class SimilarArtists extends Component {
         let genreContainer;
         let viz;
         let sourceArtist;
-        let sourceArtistImage;
+        let sourceArtistImage  = <></>
         let title = <Helmet>
                         <title>BandViz</title>
                     </Helmet>
 
-        if(this.state.route_changed == 1) {sourceArtistImage = <div id="source-artist-image" style={{backgroundImage: `url(${sao.images[0].url})`}}></div>
-        }else{sourceArtist = <></>}
-        
         if(typeof sao !== "undefined" && typeof sao.images !== "undefined") {
             var genreLength = sao.genres.length;
             let genreTitle = "Genres"
@@ -285,6 +284,10 @@ class SimilarArtists extends Component {
             title = <Helmet>
                         <title>{sao.name} | BandViz</title>
                     </Helmet>
+
+            if (this.state.route_changed == 1) {
+                sourceArtistImage = <div id="source-artist-image" style={{ backgroundImage: `url(${sao.images[0].url})` }}></div>
+            } else { sourceArtistImage = <></> }
 
             if(typeof toptracks !== "undefined") {
                 var track_count = 0;

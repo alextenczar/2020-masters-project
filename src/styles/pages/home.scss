@@ -35,3 +35,18 @@
       }
   }
 }
+.help-link {
+    animation: fadein 2s ease-in;
+    display: initial;
+    position: absolute;
+    right: 0;
+    margin: 1em;
+    text-decoration: none;
+    opacity: 1;
+    visibility: unset;
+    transition: visibility .5s, opacity .5s linear, color 0.25s ease-in;
+    #help-button {
+        padding: .25em;
+        width: 2em;
+    }
+}
