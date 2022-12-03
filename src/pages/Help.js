@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { ReactComponent as Back } from '../static/icons/back.svg';
-import { Link, withRouter } from 'react-router-dom';
-import LottieAnimation from '../config/Lottie';
+import { Link } from 'react-router-dom';
+import Lottie from "lottie-react";
 import pinchZoom from '../static/lottie/pinchZoom.json';
 import mouseZoom from '../static/lottie/mouseZoom.json';
 import { ReactComponent as Logo } from '../static/icons/bandviz-logo.svg';
@@ -13,7 +13,8 @@ class Help extends Component {
         super();
     }
 
-    leave(event){
+
+    leave(event) {
         var tooltip = document.getElementById("tooltip");
         tooltip.style.opacity = 0;
     }
@@ -23,8 +24,8 @@ class Help extends Component {
         tooltip.style.left = (event.clientX + 20) + "px";
         tooltip.style.top = event.clientY + "px";
     }
-    
-    componentDidMount(){
+
+    componentDidMount() {
         var bubble = document.getElementById("bubble");
         var tooltip = document.getElementById("tooltip");
         bubble.addEventListener("mousemove", this.hover);
@@ -51,8 +52,8 @@ class Help extends Component {
                         <Logo id="logo"></Logo>
                     </div>
                     <div className="animation-container">
-                        <LottieAnimation lotti={pinchZoom} height={150} width={150} />
-                        <LottieAnimation lotti={mouseZoom} height={100} width={100} />
+                        <Lottie animationData={pinchZoom} style={{ height: 150, width: 150 }} />
+                        <Lottie animationData={mouseZoom} style={{ height: 100, width: 100 }} />
                     </div>
                     <div className="explanation">
                         <p>
@@ -75,12 +76,12 @@ class Help extends Component {
                                 <feDropShadow dx="-0.8" dy="-0.8" stdDeviation="0"
                                     flood-color="pink" flood-opacity="0.5" />
                             </filter>
-                            <circle id="bubble" cx="50" cy="50" r="40" fill="white"/>
+                            <circle id="bubble" cx="50" cy="50" r="40" fill="white" />
                         </svg>
                         <h5>Hover/Tap Me!</h5>
                         <div className="explanation">
                             <p>
-                            <h3>Desktop:</h3>
+                                <h3>Desktop:</h3>
                                 <b>Hover</b> over an artist's bubble to see their name and similarity. <b>Click</b> it to see their viz.
                             </p>
                             <p>
@@ -88,7 +89,7 @@ class Help extends Component {
                                 <b>Tap</b> an artist's bubble to see their name and similarity. <b>Tap</b> it again to see their viz.
                             </p>
                         </div>
-                        <div id="tooltip">Khalid <br/> Similarity: 80%</div>
+                        <div id="tooltip">Khalid <br /> Similarity: 80%</div>
                     </div>
                     <h4 id="enjoy">That's it, enjoy finding new artists! - Alex</h4>
                 </div>
